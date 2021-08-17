@@ -6,16 +6,39 @@ namespace VisualParser
 {
     public static class UserInfoCollector
     {
+        /// <summary>
+        /// Method formats given browser name and sets appropriate BrowserType
+        /// </summary>
+        /// <param name="browserName">Browser name</param>
+        /// <param name="type">out param browser type</param>
+        /// <returns>Formatted browser name</returns>
+        private static string FormatBrowserName(string browserName, out BrowserType type) {
+            // Default values
+            string formattedName = browserName.ToLower().Trim();
+            type = BrowserType.None;
+
+            if (formattedName.Contains("chrome")) {
+                type = BrowserType.Chrome;
+                return "chrome";
+            }
+            if (formattedName.Contains("firefox")) {
+                type = BrowserType.Firefox;
+                return "firefox";
+            }
+            
+            return formattedName;
+        }
+        
         public static void UpdateGlobalInfo() {
             // Collecting formatted browser's name and type
-            string newBrowserName = Utils.FormatBrowserName(GetDefaultBrowserName(), out var newBrowserType);
+            string newBrowserName = FormatBrowserName(GetDefaultBrowserName(), out var newBrowserType);
             // Updating data
             GlobalUserInfo.BrowserName = newBrowserName;
             GlobalUserInfo.Browser = newBrowserType;
             GlobalUserInfo.BrowserVersion = GetBrowserVersion(newBrowserName);
         }
 
-        public static string GetDefaultBrowserName() {
+        private static string GetDefaultBrowserName() {
             if (GlobalUserInfo.OS == OSPlatform.Windows) {
                 // Path in register of http handler (default browser)
                 const string keyName = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\URLAssociations\http\UserChoice";
@@ -29,11 +52,14 @@ namespace VisualParser
                 Console.WriteLine($"Detected unformatted name: {name}");
                 return name;
             }
-            
+            if (GlobalUserInfo.OS == OSPlatform.OSX) {
+                // TODO: test this command before actual code this
+                // plutil -p ~/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist | grep 'https' -b3 |awk 'NR==3 {split($4, arr, "\""); print arr[2]}'
+            }
             throw new NotSupportedException("Are you running this on toaster?!?!");
         }
 
-        public static string GetBrowserVersion(string browserName) {
+        private static string GetBrowserVersion(string browserName) {
             if (GlobalUserInfo.OS == OSPlatform.Windows) {
                 // Path in register for getting browser's version
                 string keyVersion = $@"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{browserName}.exe";
@@ -46,10 +72,6 @@ namespace VisualParser
             }
             
             throw new NotSupportedException("Are you running this on toaster?!?!");
-        }
-
-        public static string GetBrowserVersion() {
-            return GetBrowserVersion(GlobalUserInfo.BrowserName);
         }
     }
 }
