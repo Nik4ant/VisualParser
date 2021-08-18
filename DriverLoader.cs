@@ -12,8 +12,17 @@ using VisualParser.Data;
 
 namespace VisualParser
 {
-    // TODO: write note here that explains all this shit down below
-    // TODO: add sync methods???
+    /*
+    "static abstract" or "static virtual" feature not available in C# yet, so:
+    1) Have to create Instance field in subclasses of BaseDriverLoader
+    for calling '_LoadAsync' from base class. (If i created instance in base class
+    it would call base virtual method)
+    2) For easier use there is public static method LoadAsync 
+    (instead of calling if from Instance field)
+    
+    Can't find another proper solution.
+    */
+
     class BaseDriverLoader {
         // Path for downloading driver
         #if DEBUG
@@ -47,9 +56,11 @@ namespace VisualParser
 
     class ChromeDriverLoader : BaseDriverLoader {
         private static readonly ChromeDriverLoader Instance = new ChromeDriverLoader();
+        // Link with all chrome drivers data
         private const string ChromeDriversLink = "https://chromedriver.chromium.org/downloads";
-
+        // TODO: small one line comment for each method
         public static async Task LoadAsync(string browserVersion) { await Instance._LoadAsync(browserVersion); }
+        
         protected override async Task<string> _GetDownloadUrlAsync(string browserVersion) {
             StringBuilder downloadUrl = new StringBuilder();
             downloadUrl.Append("https://chromedriver.storage.googleapis.com/");
@@ -58,13 +69,13 @@ namespace VisualParser
             // Adding driver version to url
             downloadUrl.Append($"{driversVersions[browserVersion.Split('.')[0]]}/");
             // Adding filename for each platform
-            if (GlobalUserInfo.OS == OSPlatform.Windows) {
+            if (UserInfoContainer.OS == OSPlatform.Windows) {
                 downloadUrl.Append("chromedriver_win32.zip");
             }
-            else if (GlobalUserInfo.OS == OSPlatform.Linux) {
+            else if (UserInfoContainer.OS == OSPlatform.Linux) {
                 downloadUrl.Append("chromedriver_linux64.zip");
             }
-            else if (GlobalUserInfo.OS == OSPlatform.OSX) {
+            else if (UserInfoContainer.OS == OSPlatform.OSX) {
                 downloadUrl.Append("chromedriver_mac64.zip");
             }
             

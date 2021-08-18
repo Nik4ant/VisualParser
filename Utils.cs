@@ -37,7 +37,7 @@ namespace VisualParser
         }
         
         // TODO: support for '{' and '}' symbols
-        // TODO: IT'S SO BAD. Improve performance
+        // TODO: IT'S SO BAD. Improve performance and try make it easy to use
         /// <summary>
         /// Method for easier use of colored text in the console.
         /// It supports limited amount of colors set in ForegroundColorsData.

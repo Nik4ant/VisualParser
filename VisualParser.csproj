@@ -9,4 +9,8 @@
       <PackageReference Include="HtmlAgilityPack" Version="1.11.36" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Drivers" />
+    </ItemGroup>
+
 </Project>
