@@ -42,11 +42,11 @@ namespace VisualParser
             // Extracting downloaded .zip
             try {
                 ZipFile.ExtractToDirectory(pathToDriver, PathToDriverFolder);
-                Utils.ColoredWriteLine($"Driver was loaded. Relative path to folder: {{y}}{PathToDriverFolder}\\{{y}}");
+                ColoredConsole.WriteLine($"Driver was loaded. Relative path to folder: [Yellow]{PathToDriverFolder}[/Yellow]");
             }
             catch (IOException) {
-                Utils.ColoredWriteLine("{r}ERROR!\\{r} Driver is downloaded already or something went wrong");
-                Utils.ColoredWriteLine($"Relative path to folder: {{r}}{PathToDriverFolder}\\{{r}}");
+                ColoredConsole.WriteLine("[Red]ERROR![/Red] Driver is downloaded already or something went wrong");
+                ColoredConsole.WriteLine($"Relative path to folder: [Red]{PathToDriverFolder}[/Red]");
             }
             // Removing .zip file
             File.Delete(pathToDriver);

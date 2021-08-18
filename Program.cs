@@ -19,7 +19,7 @@ namespace VisualParser
                     await UserInfoContainer.UpdateInfoAsync(AppDataFilename);
                 }
                 catch (Exception e) {
-                    Utils.ColoredWriteLine("{r}ERROR!\\{r} Bad data or something went wrong");
+                    ColoredConsole.WriteLine("[Red]ERROR![/Red] Bad data or something went wrong");
                     Console.WriteLine("Updating data manually...");
                     UserInfoContainer.UpdateInfo();
                     await UserInfoContainer.SaveToJsonAsync(AppDataFilename);
@@ -30,13 +30,13 @@ namespace VisualParser
                 await UserInfoContainer.SaveToJsonAsync(AppDataFilename);
             }
             
-            Utils.ColoredWriteLine($"Name: {{y}}{UserInfoContainer.Instance.BrowserName}\\{{y}}");
-            Utils.ColoredWriteLine($"Version: {{g}}{UserInfoContainer.Instance.BrowserVersion}\\{{g}}");
+            ColoredConsole.WriteLine($"Name: [Yellow]{UserInfoContainer.Instance.BrowserName}[/Yellow]");
+            ColoredConsole.WriteLine($"Version: [Yellow]{UserInfoContainer.Instance.BrowserVersion}[/Yellow]");
 
             await ChromeDriverLoader.LoadAsync(UserInfoContainer.Instance.BrowserVersion);
             
-            Console.Write("\nPress any key: ");
-            Console.ReadKey();
+            /*Console.Write("\nPress any key: ");
+            Console.ReadKey();*/
         }
     }
 }
