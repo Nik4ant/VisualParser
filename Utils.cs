@@ -93,10 +93,10 @@ namespace VisualParser
         }
     
         /// <summary>
-        /// 
+        /// Print text in console using given color
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="color"></param>
+        /// <param name="text">Text to print</param>
+        /// <param name="color">Color for text</param>
         public static void WriteLine(string text, ConsoleColor color) {
             Console.ForegroundColor = color;
             Console.WriteLine(text);
