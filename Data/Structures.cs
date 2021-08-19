@@ -42,7 +42,7 @@ namespace VisualParser.Data
         public static void UpdateInfo(string browserName, string browserVersion, 
             BrowserType browserType) {
             Instance.BrowserName = browserName;
-            Instance.BrowserVersion = browserVersion;
+            Instance.BrowserVersion = browserVersion.Trim();
             Instance.Browser = browserType;
         }
         

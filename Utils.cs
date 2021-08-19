@@ -66,7 +66,9 @@ namespace VisualParser
                         Console.Write(text[lastColoredTextIndex..i]);
                         Console.ForegroundColor = ConsoleColor.Gray;
                         // Updating indexes
-                        i += currentColorBuilder.Length + 2;
+                        if (i + lastColorNameLenght + 2 < text.Length) { 
+                            i += lastColorNameLenght + 2;
+                        }
                         lastOutputStartIndex = i + 1;
                     }
                     // Else parsing color and move on
@@ -88,7 +90,7 @@ namespace VisualParser
                     }
                 }
             }
-            Console.Write(text[(lastOutputStartIndex + lastColorNameLenght)..]);
+            Console.Write(text[lastOutputStartIndex..]);
             Console.Write('\n');
         }
     

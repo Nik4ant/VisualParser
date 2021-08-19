@@ -31,9 +31,26 @@ namespace VisualParser
             }
             
             ColoredConsole.WriteLine($"Name: [Yellow]{UserInfoContainer.Instance.BrowserName}[/Yellow]");
-            ColoredConsole.WriteLine($"Version: [Yellow]{UserInfoContainer.Instance.BrowserVersion}[/Yellow]");
-
-            await ChromeDriverLoader.LoadAsync(UserInfoContainer.Instance.BrowserVersion);
+            ColoredConsole.WriteLine($"Version: [Yellow]{UserInfoContainer.Instance.BrowserVersion}[/Yellow]\n");
+            // Downloading needed driver
+            ColoredConsole.WriteLine("Looking for a driver...", ConsoleColor.DarkYellow);
+            switch (UserInfoContainer.Instance.Browser) {
+                case BrowserType.Chrome: 
+                    await ChromeDriverLoader.LoadAsync(UserInfoContainer.Instance.BrowserVersion);
+                    break;
+                case BrowserType.Firefox:
+                    throw new NotImplementedException();
+                    break;
+                case BrowserType.Edge: 
+                    throw new NotImplementedException();
+                    break;
+                case BrowserType.Opera: 
+                    throw new NotImplementedException();
+                    break;
+                case BrowserType.Safari: 
+                    throw new NotImplementedException();
+                    break;
+            }
             
             /*Console.Write("\nPress any key: ");
             Console.ReadKey();*/
