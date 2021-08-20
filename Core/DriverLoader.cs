@@ -24,29 +24,21 @@ namespace VisualParser
     */
 
     class BaseDriverLoader {
-        // Path for downloading driver
-        #if DEBUG
-            const string PathToDriverFolder = @"..\..\..\Drivers";
-        #else
-            // TODO: test this path
-            const string PathToDriverFolder = ".\Drivers";
-        #endif
-
         protected async Task _LoadAsync(string browserVersion) {
             // Creating "Drivers" folder if it doesn't exists
-            Directory.CreateDirectory(PathToDriverFolder);
+            Directory.CreateDirectory(Globals.PathToDriverFolder);
             // Relative and absolute paths to .zip with downloaded driver
-            var pathToDriver = PathToDriverFolder + "\\driver.zip";
+            var pathToDriver = Globals.PathToDriverFolder + "\\driver.zip";
             // Downloading driver
             await Utils.DownloadFileByUrlAsync(await _GetDownloadUrlAsync(browserVersion), Path.GetFullPath(pathToDriver));
             // Extracting downloaded .zip
             try {
-                ZipFile.ExtractToDirectory(pathToDriver, PathToDriverFolder);
-                ColoredConsole.WriteLine($"[Green]Driver was loaded[/Green]. Relative path to folder: [Yellow]{PathToDriverFolder}[/Yellow]");
+                ZipFile.ExtractToDirectory(pathToDriver, Globals.PathToDriverFolder);
+                ColoredConsole.WriteLine($"[Green]Driver was loaded[/Green]. Relative path to folder: [Yellow]{Globals.PathToDriverFolder}[/Yellow]");
             }
             catch (IOException) {
                 ColoredConsole.WriteLine("[Red]ERROR![/Red] Driver is downloaded already or something went wrong");
-                ColoredConsole.WriteLine($"Relative path to folder: [Red]{PathToDriverFolder}[/Red]");
+                ColoredConsole.WriteLine($"Relative path to folder: [Red]{Globals.PathToDriverFolder}[/Red]");
             }
             // Removing .zip file
             File.Delete(pathToDriver);
@@ -69,13 +61,13 @@ namespace VisualParser
             // Adding driver version to url
             downloadUrl.Append($"{driversVersions[browserVersion.Split('.')[0]]}/");
             // Adding filename for each platform
-            if (UserInfoContainer.OS == OSPlatform.Windows) {
+            if (Globals.CurrentUserInfo.OS == OSPlatform.Windows) {
                 downloadUrl.Append("chromedriver_win32.zip");
             }
-            else if (UserInfoContainer.OS == OSPlatform.Linux) {
+            else if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
                 downloadUrl.Append("chromedriver_linux64.zip");
             }
-            else if (UserInfoContainer.OS == OSPlatform.OSX) {
+            else if (Globals.CurrentUserInfo.OS == OSPlatform.OSX) {
                 downloadUrl.Append("chromedriver_mac64.zip");
             }
             
