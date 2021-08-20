@@ -1,25 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Text.Json;
-using System.Threading.Tasks;
-using VisualParser;
 
 namespace VisualParser.Data
 {
-    /// Enum with browsers
-    public enum BrowserType : byte {
-        Chrome,
-        Firefox,
-        Opera,
-        Safari,
-        Edge,
-        None
-    }
-    
     public class UserInfoContainer {
         // User's OS
-        public OSPlatform OS { get; private set; }
+        public OSPlatform OS { get; }
         // User's browser
         public string BrowserName { get; set; }
         public string BrowserVersion { get; set; }

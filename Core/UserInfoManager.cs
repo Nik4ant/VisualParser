@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using VisualParser.Data;
 
-namespace VisualParser
+namespace VisualParser.Core
 {
     public static class UserInfoManager {
         /// <summary>

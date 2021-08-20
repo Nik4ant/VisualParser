@@ -8,9 +8,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
-using VisualParser.Data;
 
-namespace VisualParser
+namespace VisualParser.Core
 {
     /*
     "static abstract" or "static virtual" feature not available in C# yet, so:
