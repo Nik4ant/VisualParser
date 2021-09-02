@@ -1,13 +1,14 @@
-﻿using VisualParser.Data;
+﻿using System.IO;
+using VisualParser.Data;
 
 namespace VisualParser {
     public static class Globals {
         // Path for downloading driver
         #if DEBUG
-            public const string PathToDriverFolder = @"..\..\..\Drivers";
+            // Note(Nik4ant): Looks kinda bad, i know. Have no idea how make it shorter
+            public static readonly string PathToDriverFolder = @$"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}Drivers";
         #else
-            // TODO: test this path
-            public const string PathToDriverFolder = ".\Drivers";
+            public static readonly string PathToDriverFolder = $".{Path.DirectorySeparatorChar}Drivers";
         #endif
         // Filename of json file with app's data
         public const string AppDataFilename = "app_data.json";

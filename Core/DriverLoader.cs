@@ -23,11 +23,12 @@ namespace VisualParser.Core
     */
 
     class BaseDriverLoader {
+        // Method that downloads driver that matches given browser version
         protected async Task _LoadAsync(string browserVersion) {
             // Creating "Drivers" folder if it doesn't exists
             Directory.CreateDirectory(Globals.PathToDriverFolder);
             // Relative and absolute paths to .zip with downloaded driver
-            var pathToDriver = Globals.PathToDriverFolder + "\\driver.zip";
+            string pathToDriver = Globals.PathToDriverFolder + $"{Path.DirectorySeparatorChar}driver.zip";
             // Downloading driver
             await Utils.DownloadFileByUrlAsync(await _GetDownloadUrlAsync(browserVersion), Path.GetFullPath(pathToDriver));
             // Extracting downloaded .zip
@@ -42,14 +43,15 @@ namespace VisualParser.Core
             // Removing .zip file
             File.Delete(pathToDriver);
         }
-        protected virtual async Task<string> _GetDownloadUrlAsync(string browserVersion) { throw new NotImplementedException(); }
+        
+        // Method that parse download url for _LoadAsync method
+        protected virtual Task<string> _GetDownloadUrlAsync(string browserVersion) { throw new NotImplementedException(); }
     }
 
     class ChromeDriverLoader : BaseDriverLoader {
         private static readonly ChromeDriverLoader Instance = new ChromeDriverLoader();
         // Link with all chrome drivers data
         private const string ChromeDriversLink = "https://chromedriver.chromium.org/downloads";
-        // TODO: small one line comment for each method
         public static async Task LoadAsync(string browserVersion) { await Instance._LoadAsync(browserVersion); }
         
         protected override async Task<string> _GetDownloadUrlAsync(string browserVersion) {
@@ -93,5 +95,57 @@ namespace VisualParser.Core
             return result;
         }
 
+    }
+    
+    class FirefoxDriverLoader : BaseDriverLoader {
+        private static readonly FirefoxDriverLoader Instance = new FirefoxDriverLoader();
+        // Link to docs with compatible driver and browser versions
+        private const string CompatibleVersionLink =
+            "https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html";
+        // Link to driver itself
+        private const string FirefoxDriverLink = "https://github.com/mozilla/geckodriver/releases/download/";
+        
+        public static async Task LoadAsync(string browserVersion) { await Instance._LoadAsync(browserVersion); }
+        
+        protected override async Task<string> _GetDownloadUrlAsync(string browserVersion) {
+            var downloadUrl = new StringBuilder(FirefoxDriverLink);
+            // Parsing compatible driver version
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(await new HttpClient().GetStringAsync(CompatibleVersionLink));
+            // Major version of browser
+            ColoredConsole.Debug(browserVersion.Split('.')[0]);
+            short searchingBrowserVersion = short.Parse(browserVersion.Split('.')[0]);
+            // Selecting first driver version that match to given browser version
+            var tableNode = htmlDoc.DocumentNode.SelectSingleNode("//*[@id=\"supported-platforms\"]/table");
+            foreach (HtmlNode columnNode in tableNode.SelectNodes("./tr")) {
+                short minVersion = short.Parse(columnNode.ChildNodes[3].InnerText.Trim());
+                // Check if limit for browser version exists
+                short maxVersion = short.MaxValue;
+                string formattedVersion = columnNode.LastChild.InnerText.Trim();
+                if (formattedVersion != "n/a") {
+                    maxVersion = short.Parse(formattedVersion);
+                }
+                // Compare given browser version to min and max versions range
+                if (minVersion <= searchingBrowserVersion && searchingBrowserVersion <= maxVersion) {
+                    var driverVersion = columnNode.ChildNodes[1].InnerText.Trim();
+                    downloadUrl.Append($"v{driverVersion}/geckodriver-v{driverVersion}-");
+                    break;
+                }
+            }
+            // Adding OS to download url
+            if (Globals.CurrentUserInfo.OS == OSPlatform.Windows) {
+                downloadUrl.Append("win32.zip");
+            }
+            else if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
+                downloadUrl.Append("linux32.tar.gz");
+            }
+            else if (Globals.CurrentUserInfo.OS == OSPlatform.OSX) {
+                downloadUrl.Append("macos.tar.gz");
+            }
+            else {
+                throw new NotSupportedException("Are you running this on toaster?");
+            }
+            return downloadUrl.ToString();
+        }
     }
 }

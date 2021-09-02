@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using VisualParser.Core;
 using VisualParser.Data;
+using VisualParser.Selector;
 
 namespace VisualParser
 {
@@ -31,26 +32,31 @@ namespace VisualParser
             
             ColoredConsole.WriteLine($"Name: [Yellow]{Globals.CurrentUserInfo.BrowserName}[/Yellow]");
             ColoredConsole.WriteLine($"Version: [Yellow]{Globals.CurrentUserInfo.BrowserVersion}[/Yellow]\n");
-            // TODO: Check if driver already exists
-            // Downloading needed driver
             ColoredConsole.WriteLine("Looking for a driver...", ConsoleColor.DarkYellow);
-            switch (Globals.CurrentUserInfo.Browser) {
-                case BrowserType.Chrome: 
-                    await ChromeDriverLoader.LoadAsync(Globals.CurrentUserInfo.BrowserVersion);
-                    break;
-                case BrowserType.Firefox:
-                    throw new NotImplementedException();
-                    break;
-                case BrowserType.Edge: 
-                    throw new NotImplementedException();
-                    break;
-                case BrowserType.Opera: 
-                    throw new NotImplementedException();
-                    break;
-                case BrowserType.Safari: 
-                    throw new NotImplementedException();
-                    break;
+            // Downloading needed driver only if it's not exists already
+            if (Directory.GetFiles(Globals.PathToDriverFolder).Length == 0) {
+                switch (Globals.CurrentUserInfo.Browser) {
+                    case BrowserType.Chrome:
+                        await ChromeDriverLoader.LoadAsync(Globals.CurrentUserInfo.BrowserVersion);
+                        break;
+                    case BrowserType.Firefox:
+                        await FirefoxDriverLoader.LoadAsync(Globals.CurrentUserInfo.BrowserVersion);
+                        break;
+                    case BrowserType.Edge:
+                        throw new NotImplementedException();
+                        break;
+                    case BrowserType.Opera:
+                        throw new NotImplementedException();
+                        break;
+                    case BrowserType.Safari:
+                        throw new NotImplementedException();
+                        break;
+                }
             }
+            else {
+               ColoredConsole.WriteLine("Driver already exists\n", ConsoleColor.Green); 
+            }
+            LocatorStartUp.Launch();
             
             /*Console.Write("\nPress any key: ");
             Console.ReadKey();*/

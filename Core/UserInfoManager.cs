@@ -43,11 +43,7 @@ namespace VisualParser.Core
                     $"/command Get-ItemProperty -Path Registry::{keyName} -Name \"ProgId\" | Select -ExpandProperty \"ProgId\"");
             }
             if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
-                // TODO: patch out this shit after testing on Linux
-                Console.WriteLine("Better pray and cross your fingers. I have no fucking idea will it work on Linux...");
-                string name = Utils.GetTerminalData("/bin/bash", "xdg-settings get default-web-browser");
-                Console.WriteLine($"Detected unformatted name: {name}");
-                return name;
+                return Utils.GetTerminalData("/bin/bash", "xdg-settings get default-web-browser");;
             }
             if (Globals.CurrentUserInfo.OS == OSPlatform.OSX) {
                 // TODO: test this command before actual code this
@@ -70,6 +66,7 @@ namespace VisualParser.Core
                     $"/command (Get-Item (Get-ItemProperty '{keyVersion}').'(Default)').VersionInfo.ProductVersion");
             }
             if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
+                // TODO: fix it. Maybe try use unformatted name instead
                 return Utils.GetTerminalData("/bin/bash", $"{browserName} --version");
             }
             throw new NotSupportedException("Are you running this on toaster?!?!");

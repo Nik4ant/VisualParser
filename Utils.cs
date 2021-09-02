@@ -39,8 +39,9 @@ namespace VisualParser
         /// <summary>
         /// Method for easier use of colored text in the console.
         /// It supports color defined in ConsoleColor class. Given text should
-        /// be formatted like this: [*color string*]*colored text*[/*color string*]
-        /// For example: [yellow]This is yellow[/yellow]. Cool. And [green]this is green[/green]
+        /// be formatted like this: [*color string*]*colored text*[/*color string*].
+        /// Where *color string* is one of the values from ConsoleColor enum
+        /// For example: [Yellow]This is yellow[/Yellow]. Cool. And [Green]this is green[/Green]
         /// </summary>
         /// <param name="text">Text with color indicators</param>
         public static void WriteLine(string text) {
@@ -102,5 +103,7 @@ namespace VisualParser
             Console.WriteLine(text);
             Console.ForegroundColor = ConsoleColor.Gray;
         }
+
+        public static void Debug(string text) { WriteLine(text, ConsoleColor.Red); }
     }
 }
