@@ -8,19 +8,31 @@ using VisualParser.Selector;
 namespace VisualParser
 {
     class Program {
+        
+        // TODO: if there wouldn't be any reasons to use
+        // async stuff in the future i should better get rid of it
         static async Task Main(string[] args) {
             // This collects all needed data and store it to global info
             // object (static readonly Instance of UserInfoContainer)
             if (File.Exists(Globals.AppDataFilename)) {
-                Console.WriteLine("Loading from json...");
-                // If program can't load data from .json file it will update manually
-                // and save new data to .json
-                try {
-                    await UserInfoManager.UpdateAsync(Globals.AppDataFilename);
+                // Json data might become old after browser update, so have to ask user
+                bool useJsonData = Utils.AskUserInput("Use old .json data? [y/n] ", 
+                                                      ConsoleColor.Yellow);
+                if (useJsonData) {
+                    ColoredConsole.WriteLine("Loading from json...", ConsoleColor.Yellow);
+                    // If program can't load data from .json file it will update manually
+                    // and save new data to .json
+                    try {
+                        await UserInfoManager.UpdateAsync(Globals.AppDataFilename);
+                    }
+                    catch (Exception e) {
+                        ColoredConsole.WriteLine("[Red]ERROR![/Red] Bad data or something went wrong");
+                        Console.WriteLine("Updating data manually...");
+                        UserInfoManager.Update();
+                        await UserInfoManager.SaveToJsonAsync(Globals.AppDataFilename);
+                    }
                 }
-                catch (Exception e) {
-                    ColoredConsole.WriteLine("[Red]ERROR![/Red] Bad data or something went wrong");
-                    Console.WriteLine("Updating data manually...");
+                else {
                     UserInfoManager.Update();
                     await UserInfoManager.SaveToJsonAsync(Globals.AppDataFilename);
                 }

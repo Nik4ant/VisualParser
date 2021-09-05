@@ -33,6 +33,30 @@ namespace VisualParser
             await Task.Run(() => client.DownloadFile(url, pathToSave));
             client.Dispose();
         }
+    
+        /// <summary>
+        /// Method for easier ask [y/n] questions from user
+        /// </summary>
+        /// <param name="textQuestion">Question</param>
+        /// <param name="questionColor">Color for printing question</param>
+        /// <returns>true if 'y' false if 'n'</returns>
+        public static bool AskUserInput(string textQuestion, ConsoleColor questionColor = ConsoleColor.DarkGray) {
+            ColoredConsole.Write(textQuestion, questionColor);
+            bool result;
+            while (true) {
+                var key = Console.ReadKey(true).Key;
+                if (key == ConsoleKey.Y) {
+                    result = true;
+                    break;
+                }
+                if (key == ConsoleKey.N) {
+                    result = false;
+                    break;
+                }
+            }
+            Console.Write('\n');
+            return result;
+        }
     }
 
     static class ColoredConsole {
@@ -44,7 +68,7 @@ namespace VisualParser
         /// For example: [Yellow]This is yellow[/Yellow]. Cool. And [Green]this is green[/Green]
         /// </summary>
         /// <param name="text">Text with color indicators</param>
-        public static void WriteLine(string text) {
+        public static void Write(string text) {
             // For parsing color
             StringBuilder currentColorBuilder = new StringBuilder(12);
             // Last parsed color
@@ -90,20 +114,31 @@ namespace VisualParser
                 }
             }
             Console.Write(text[lastOutputStartIndex..]);
-            Console.Write('\n');
         }
-    
+        
         /// <summary>
         /// Print text in console using given color
         /// </summary>
         /// <param name="text">Text to print</param>
         /// <param name="color">Color for text</param>
-        public static void WriteLine(string text, ConsoleColor color) {
+        public static void Write(string text, ConsoleColor color) {
             Console.ForegroundColor = color;
-            Console.WriteLine(text);
+            Console.Write(text);
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
+        // Same as Write (with text only) but with '\n' at the end
+        public static void WriteLine(string text) {
+            Write(text);
+            Console.Write('\n');
+        }
+        
+        // Same as Write (with color param) but with '\n' at the end
+        public static void WriteLine(string text, ConsoleColor color) {
+            Write(text, color);
+            Console.Write('\n');
+        }
+        
         public static void Debug(string text) { WriteLine(text, ConsoleColor.Red); }
     }
 }

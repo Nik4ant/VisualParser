@@ -32,6 +32,7 @@ namespace VisualParser.Core
             // Downloading driver
             await Utils.DownloadFileByUrlAsync(await _GetDownloadUrlAsync(browserVersion), Path.GetFullPath(pathToDriver));
             // Extracting downloaded .zip
+            // TODO: ask user about overriding old file
             try {
                 ZipFile.ExtractToDirectory(pathToDriver, Globals.PathToDriverFolder);
                 ColoredConsole.WriteLine($"[Green]Driver was loaded[/Green]. Relative path to folder: [Yellow]{Globals.PathToDriverFolder}[/Yellow]");
