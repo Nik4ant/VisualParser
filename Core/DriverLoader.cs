@@ -24,6 +24,7 @@ namespace VisualParser.Core
 
         // Method that downloads driver that matches given browser version
         protected void _Load(string browserVersion) {
+            ColoredConsole.WriteLine("Looking for a driver...", ConsoleColor.DarkYellow);
             // Creating "Drivers" folder if it doesn't exists
             // TODO: for no reason Linux crash there (research)
             Directory.CreateDirectory(Globals.PathToDriverFolder);
@@ -32,13 +33,12 @@ namespace VisualParser.Core
                 // If user want to override existing driver old one will be deleted
                 bool overrideFile = Utils.AskUserInput("Driver already exist, do you want to override it? [y/n] ", 
                     ConsoleColor.Yellow);
-                if (overrideFile) {
-                    // To make sure program delete all files inside Driver folder
-                    foreach (string path in Directory.GetFiles(Globals.PathToDriverFolder))
-                        File.Delete(path);
-                    ColoredConsole.WriteLine("Old driver deleted, downloading new one...", ConsoleColor.DarkYellow);
-                }
-                    
+                if (!overrideFile)
+                    return;
+                // To make sure program delete all files inside Driver folder
+                foreach (string path in Directory.GetFiles(Globals.PathToDriverFolder))
+                    File.Delete(path);
+                ColoredConsole.WriteLine("Old driver deleted, downloading new one...", ConsoleColor.DarkYellow);
             }
             // Relative and absolute paths to .zip with downloaded driver
             string pathToDriver = Globals.PathToDriverFolder + $"{Path.DirectorySeparatorChar}driver.zip";

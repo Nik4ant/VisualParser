@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+using OpenQA.Selenium.Remote;
 using VisualParser.Core;
 using VisualParser.Data;
 using VisualParser.Locator;
@@ -14,11 +13,13 @@ namespace VisualParser
             UserInfoManager.HandleInfo();
             ColoredConsole.WriteLine($"Name: [Yellow]{Globals.CurrentUserInfo.BrowserName}[/Yellow]");
             ColoredConsole.WriteLine($"Version: [Yellow]{Globals.CurrentUserInfo.BrowserVersion}[/Yellow]\n");
-            ColoredConsole.WriteLine("Looking for a driver...", ConsoleColor.DarkYellow);
+            // Driver for locator (will be init down below)
+            RemoteWebDriver driver = default;
             // Handling each driver before launching locator
             switch (Globals.CurrentUserInfo.Browser) {
                 case BrowserType.Chrome:
                     ChromeDriverLoader.Load(Globals.CurrentUserInfo.BrowserVersion);
+                    driver = DriverManager.GetConfiguredChromeDriver();
                     break;
                 case BrowserType.Firefox:
                     FirefoxDriverLoader.Load(Globals.CurrentUserInfo.BrowserVersion);
@@ -33,7 +34,7 @@ namespace VisualParser
                     throw new NotImplementedException();
                     break;
             }
-            LocatorStartUp.Launch();
+            LocatorStartUp.Launch(driver);
         }
     }
 }

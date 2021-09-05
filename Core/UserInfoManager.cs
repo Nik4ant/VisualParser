@@ -53,21 +53,22 @@ namespace VisualParser.Core
         }
 
         /// <summary>
-        /// Method gets version of given browser by it's name
+        /// Method gets version of given browser by it's formatted and unformatted names
+        /// (Depending on OS need different name. For example on Windows need formatted name)
         /// </summary>
-        /// <param name="browserName">Name of browser</param>
+        /// <param name="formattedBrowserName">Formatted name of browser</param>
+        /// <param name="unformattedBrowserName">Unformatted name of browser</param>
         /// <returns>Browser's version</returns>
-        private static string GetBrowserVersion(string browserName) {
+        private static string GetBrowserVersion(string formattedBrowserName, string unformattedBrowserName) {
             if (Globals.CurrentUserInfo.OS == OSPlatform.Windows) {
                 // Path in register for getting browser's version
-                string keyVersion = $@"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{browserName}.exe";
+                string keyVersion = $@"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{formattedBrowserName}.exe";
                 // Parse version
                 return Utils.GetTerminalData("powershell", 
                     $"/command (Get-Item (Get-ItemProperty '{keyVersion}').'(Default)').VersionInfo.ProductVersion");
             }
             if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
-                // TODO: fix it. Maybe try use unformatted name instead
-                return Utils.GetTerminalData("/bin/bash", $"{browserName} --version");
+                return Utils.GetTerminalData("/bin/bash", $"{unformattedBrowserName} --version");
             }
             throw new NotSupportedException("Are you running this on toaster?!?!");
         }
@@ -106,9 +107,10 @@ namespace VisualParser.Core
         /// </summary>
         private static void Update() {
             // Collecting formatted browser's name and type
-            string newBrowserName = FormatBrowserName(GetDefaultBrowserName(), out var newBrowserType);
+            string unformattedBrowserName = GetDefaultBrowserName();
+            string formattedBrowserName = FormatBrowserName(unformattedBrowserName, out var newBrowserType);
             // Updating data
-            Update(newBrowserName, GetBrowserVersion(newBrowserName), 
+            Update(formattedBrowserName, GetBrowserVersion(formattedBrowserName, unformattedBrowserName), 
                 newBrowserType);
         }
         

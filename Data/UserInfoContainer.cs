@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace VisualParser.Data
 {
     public class UserInfoContainer {
         // User's OS
+        [JsonIgnore]
         public OSPlatform OS { get; }
         // User's browser
         public string BrowserName { get; set; }

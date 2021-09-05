@@ -1,7 +1,10 @@
-﻿namespace VisualParser.Locator
+﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Remote;
+
+namespace VisualParser.Locator
 {
     public static class LocatorStartUp {
-        public static void Launch() {
+        public static void Launch(RemoteWebDriver driver) {
             /*
              * check out: https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
              * check out: https://stackoverflow.com/questions/33225947/can-a-website-detect-when-you-are-using-selenium-with-chromedriver/41220267#41220267
@@ -13,11 +16,11 @@
              */
 
             // TODO: for no reason appears extension in browser?!?!?!??!???!?!?!!!?!?!?!?!?!?!?!???!?!?!?!!?!?!!?!??
-            var driver = DriverManager.GetConfiguredChromeDriver();
             // Note(Nik4ant): This is only placeholder for easier testing (later all that stuff will be loaded from profile)
             driver.Navigate().GoToUrl("chrome://settings/");
             driver.ExecuteScript("chrome.settingsPrivate.setDefaultZoom(0.8);");
             driver.Navigate().GoToUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+            driver.FindElementByCssSelector("#movie_player > div.ytp-cued-thumbnail-overlay > button").Click();
         }
     }
 }
