@@ -1,9 +1,4 @@
-﻿using System;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using VisualParser.Data;
-
-namespace VisualParser.Selector
+﻿namespace VisualParser.Locator
 {
     public static class LocatorStartUp {
         public static void Launch() {

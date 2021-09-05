@@ -27,10 +27,10 @@ namespace VisualParser
             return result;
         }
 
-        public static async Task DownloadFileByUrlAsync(string url, string pathToSave) {
+        public static void DownloadFileByUrl(string url, string pathToSave) {
             // Downloading file
             var client = new WebClient();
-            await Task.Run(() => client.DownloadFile(url, pathToSave));
+            client.DownloadFile(url, pathToSave);
             client.Dispose();
         }
     

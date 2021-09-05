@@ -71,13 +71,40 @@ namespace VisualParser.Core
             }
             throw new NotSupportedException("Are you running this on toaster?!?!");
         }
+
+        public static void HandleInfo() {
+            // This collects all needed data and store it to global info
+            // object (static readonly Instance of UserInfoContainer)
+            if (File.Exists(Globals.AppDataFilename)) {
+                // Json data might become old after browser update, so have to ask user
+                bool useJsonData = Utils.AskUserInput("Use old .json data? [y/n] ", 
+                    ConsoleColor.Yellow);
+                if (useJsonData) {
+                    ColoredConsole.WriteLine("Loading from json...", ConsoleColor.Yellow);
+                    // If program can't load data from .json file it will update manually
+                    // and save new data to .json
+                    try {
+                        Update(Globals.AppDataFilename);
+                    }
+                    catch (Exception e) {
+                        ColoredConsole.WriteLine("[Red]ERROR![/Red] Bad data or something went wrong");
+                        Console.WriteLine("Updating data manually...");
+                        Update();
+                        SaveToJson(Globals.AppDataFilename);
+                    }
+                    return;
+                }
+            }
+            Update();
+            SaveToJson(Globals.AppDataFilename);
+        }
         
         #region Update methods overloads
         /// <summary>
         /// Method gets current user's info and store it to Globals.CurrentUserInfo
         /// (All collected info described in Data/UserInfoContainer.cs class)
         /// </summary>
-        public static void Update() {
+        private static void Update() {
             // Collecting formatted browser's name and type
             string newBrowserName = FormatBrowserName(GetDefaultBrowserName(), out var newBrowserType);
             // Updating data
@@ -92,7 +119,7 @@ namespace VisualParser.Core
         /// <param name="browserName">User's default browser name</param>
         /// <param name="browserVersion">User's default browser version</param>
         /// <param name="browserType">User's User's default browser type</param>
-        public static void Update(string browserName, string browserVersion, 
+        private static void Update(string browserName, string browserVersion, 
             BrowserType browserType) {
             Globals.SetUserInfo(browserName, browserVersion.Trim(), browserType);
         }
@@ -102,7 +129,7 @@ namespace VisualParser.Core
         /// (All collected info described in Data/UserInfoContainer.cs class)
         /// </summary>
         /// <param name="pathToJson">Path to json file</param>
-        public static void Update(string pathToJson) {
+        private static void Update(string pathToJson) {
             var loadedContainer = LoadFromJson(pathToJson);
             Globals.SetUserInfo(loadedContainer.BrowserName, loadedContainer.BrowserVersion, 
                 loadedContainer.Browser);
@@ -114,29 +141,31 @@ namespace VisualParser.Core
         /// (All collected info described in Data/UserInfoContainer.cs class)
         /// </summary>
         /// <param name="pathToJson">Path to json file</param>
-        public static async Task UpdateAsync(string pathToJson) {
+        private static async Task UpdateAsync(string pathToJson) {
             var loadedContainer = await LoadFromJsonAsync(pathToJson);
             Globals.SetUserInfo(loadedContainer.BrowserName, loadedContainer.BrowserVersion, 
                 loadedContainer.Browser);
         }
         #endregion
         
-        public static UserInfoContainer LoadFromJson(string path) { 
+        #region Json save/load
+        private static UserInfoContainer LoadFromJson(string path) { 
             return JsonSerializer.Deserialize<UserInfoContainer>(File.ReadAllText(path));
         }
         
-        public static async Task<UserInfoContainer> LoadFromJsonAsync(string path) { 
+        private static async Task<UserInfoContainer> LoadFromJsonAsync(string path) { 
             using FileStream readStream = File.OpenRead(path);
             return await JsonSerializer.DeserializeAsync<UserInfoContainer>(readStream);
         }
         
-        public static async Task SaveToJsonAsync(string path) {
+        private static async Task SaveToJsonAsync(string path) {
             using FileStream saveStream = File.Create(path);
             await JsonSerializer.SerializeAsync(saveStream, Globals.CurrentUserInfo);
         }
         
-        public static void SaveToJson(string path) {
-            JsonSerializer.Serialize(Globals.CurrentUserInfo);
+        private static void SaveToJson(string path) {
+            File.WriteAllText(path, JsonSerializer.Serialize(Globals.CurrentUserInfo));
         }
+        #endregion
     }
 }
