@@ -12,6 +12,7 @@
 
     <ItemGroup>
       <Folder Include="Drivers" />
+      <Folder Include="Static"/>
     </ItemGroup>
 
 </Project>

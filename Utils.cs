@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace VisualParser
 {
@@ -55,6 +55,22 @@ namespace VisualParser
                 }
             }
             Console.Write('\n');
+            return result;
+        }
+    }
+
+    static class Extensions {
+        public static byte[] ToByteArray(this string text) {
+            var result = new byte[text.Length];
+            // Index for writing to result
+            ushort index = 0;
+            // Selecting only non zero (0x00) bytes
+            foreach (byte currentByte in MemoryMarshal.Cast<char, byte>(text).ToArray()) {
+                if (currentByte != 0x00) {
+                    result[index] = currentByte;
+                    index += 1;
+                }
+            }
             return result;
         }
     }

@@ -21,20 +21,27 @@ namespace VisualParser.Core
     */
 
     class BaseDriverLoader {
-
-        // Method that downloads driver that matches given browser version
-        protected void _Load(string browserVersion) {
+        /// <summary>
+        /// Method that downloads driver that matches given browser version
+        /// and return true if driver is new (was downloaded recently) otherwise false
+        /// (used to format driver. If driver is new it needs to be formated)  
+        /// </summary>
+        /// <param name="browserVersion">Version of browser</param>
+        /// <returns>true if driver is new (was downloaded recently) otherwise false</returns>
+        protected bool _Load(string browserVersion) {
             ColoredConsole.WriteLine("Looking for a driver...", ConsoleColor.DarkYellow);
             // Creating "Drivers" folder if it doesn't exists
-            // TODO: for no reason Linux crash there (research)
+            // TODO: for no reason Linux might crash there (research)
             Directory.CreateDirectory(Globals.PathToDriverFolder);
             // Check if driver is downloaded already
             if (Directory.GetFiles(Globals.PathToDriverFolder).Length != 0) {
+                // If driver is already there setting path to driver
+                Globals.SetPathToDriverBinary();
                 // If user want to override existing driver old one will be deleted
                 bool overrideFile = Utils.AskUserInput("Driver already exist, do you want to override it? [y/n] ", 
                     ConsoleColor.Yellow);
                 if (!overrideFile)
-                    return;
+                    return false;
                 // To make sure program delete all files inside Driver folder
                 foreach (string path in Directory.GetFiles(Globals.PathToDriverFolder))
                     File.Delete(path);
@@ -48,6 +55,8 @@ namespace VisualParser.Core
             try {
                 ZipFile.ExtractToDirectory(pathToDriver, Globals.PathToDriverFolder);
                 ColoredConsole.WriteLine($"[Green]Driver was loaded[/Green]. Relative path to folder: [Yellow]{Globals.PathToDriverFolder}[/Yellow]");
+                // Setting path to driver after it was downloaded
+                Globals.SetPathToDriverBinary();
             }
             catch (IOException) {
                 ColoredConsole.WriteLine("[Red]ERROR![/Red] Driver is downloaded already or something went wrong");
@@ -55,6 +64,7 @@ namespace VisualParser.Core
             }
             // Removing .zip file
             File.Delete(pathToDriver);
+            return true;
         }
         
         // Method that parse download url for _Load method
@@ -65,7 +75,7 @@ namespace VisualParser.Core
         private static readonly ChromeDriverLoader Instance = new ChromeDriverLoader();
         // Link with all chrome drivers data
         private const string ChromeDriversLink = "https://chromedriver.chromium.org/downloads";
-        public static void Load(string browserVersion) { Instance._Load(browserVersion); }
+        public static bool Load(string browserVersion) { return Instance._Load(browserVersion); }
         
         protected override string _GetDownloadUrl(string browserVersion) {
             StringBuilder downloadUrl = new StringBuilder();
@@ -119,7 +129,7 @@ namespace VisualParser.Core
         // Link to driver itself
         private const string FirefoxDriverLink = "https://github.com/mozilla/geckodriver/releases/download/";
         
-        public static void Load(string browserVersion) { Instance._Load(browserVersion); }
+        public static bool Load(string browserVersion) { return Instance._Load(browserVersion); }
         
         protected override string _GetDownloadUrl(string browserVersion) {
             var downloadUrl = new StringBuilder(FirefoxDriverLink);

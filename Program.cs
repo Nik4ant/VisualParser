@@ -18,11 +18,13 @@ namespace VisualParser
             // Handling each driver before launching locator
             switch (Globals.CurrentUserInfo.Browser) {
                 case BrowserType.Chrome:
-                    ChromeDriverLoader.Load(Globals.CurrentUserInfo.BrowserVersion);
-                    driver = DriverManager.GetConfiguredChromeDriver();
+                    bool isDriverLoadedRecently = ChromeDriverLoader.Load(Globals.CurrentUserInfo.BrowserVersion);
+                    driver = DriverManager.GetConfiguredChromeDriver(isDriverLoadedRecently);
                     break;
                 case BrowserType.Firefox:
                     FirefoxDriverLoader.Load(Globals.CurrentUserInfo.BrowserVersion);
+                    ColoredConsole.Debug("Only driver loading process working now");
+                    throw new NotImplementedException();
                     break;
                 case BrowserType.Edge:
                     throw new NotImplementedException();
@@ -33,6 +35,8 @@ namespace VisualParser
                 case BrowserType.Safari:
                     throw new NotImplementedException();
                     break;
+                default:
+                    throw new NotSupportedException();
             }
             LocatorStartUp.Launch(driver);
         }

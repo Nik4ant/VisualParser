@@ -2,7 +2,6 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using System.Threading.Tasks;
 using VisualParser.Data;
 
 namespace VisualParser.Core
@@ -136,35 +135,13 @@ namespace VisualParser.Core
             Globals.SetUserInfo(loadedContainer.BrowserName, loadedContainer.BrowserVersion, 
                 loadedContainer.Browser);
         }
-        
-        /// <summary>
-        /// Method asynchronous loads user's info from json file and
-        /// store it to Globals.CurrentUserInfo
-        /// (All collected info described in Data/UserInfoContainer.cs class)
-        /// </summary>
-        /// <param name="pathToJson">Path to json file</param>
-        private static async Task UpdateAsync(string pathToJson) {
-            var loadedContainer = await LoadFromJsonAsync(pathToJson);
-            Globals.SetUserInfo(loadedContainer.BrowserName, loadedContainer.BrowserVersion, 
-                loadedContainer.Browser);
-        }
         #endregion
         
         #region Json save/load
         private static UserInfoContainer LoadFromJson(string path) { 
             return JsonSerializer.Deserialize<UserInfoContainer>(File.ReadAllText(path));
         }
-        
-        private static async Task<UserInfoContainer> LoadFromJsonAsync(string path) { 
-            using FileStream readStream = File.OpenRead(path);
-            return await JsonSerializer.DeserializeAsync<UserInfoContainer>(readStream);
-        }
-        
-        private static async Task SaveToJsonAsync(string path) {
-            using FileStream saveStream = File.Create(path);
-            await JsonSerializer.SerializeAsync(saveStream, Globals.CurrentUserInfo);
-        }
-        
+
         private static void SaveToJson(string path) {
             File.WriteAllText(path, JsonSerializer.Serialize(Globals.CurrentUserInfo));
         }
