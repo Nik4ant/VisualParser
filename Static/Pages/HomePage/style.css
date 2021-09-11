@@ -1,0 +1,56 @@
+body {
+    background-image: url('../../Images/bg.png'); 
+    background-repeat: no-repeat; 
+    background-size: cover;
+    flex-direction: column;
+    overflow-y: hidden;
+}
+
+.button {
+    border-radius: 15px;
+    padding: 0.5rem 1.2rem 0.5rem 1.2rem ;
+    color: #fff;
+    transition: background 0.3s linear;
+    background: transparent;
+    border: solid 3px #75babb;
+    display: inline-block;
+    font-size: 32px;
+}
+.button:hover {
+    transition: background 0.3s linear;
+    background: #75babb;
+}
+
+.search-bar {
+    display: inline-flex;
+    position: relative;
+    border: 3px solid #75babb;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.searchBox,
+.searchBox:focus {
+    display: inline-flex;
+    border: 0;
+    background: transparent;
+    outline-width: 0;
+    color: #fff;
+    font-size: 32px;
+    width: 25rem;
+}
+
+.search-icon {
+    margin: auto 4px auto 8px;
+    background-image: url('../../Images/icon_search.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* This is image sizes */
+    width: 35px;
+    height: 37px;
+}
+
+.parser-line {
+    display: flex;
+    justify-content: center;
+}
