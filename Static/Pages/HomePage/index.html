@@ -5,6 +5,7 @@
         <title>Homepage</title>
         <link rel="stylesheet" href="../global_styles.css">
         <link rel="stylesheet" href="style.css">
+        <script src="index.js"></script>
     </head>
     <body class="flex-centered">
             <h1 style="color: #fff; text-align: center">Visual Parser</h1>
@@ -12,10 +13,11 @@
                 Parse ANY data you needed without being detected.
             </p>
             <div class="parser-line">
-                <button class="button" style="margin-right: 2rem;">Try now</button>
+                <button url_to_parse="" id="parser-start" class="button" style="margin-right: 2rem;">Try now</button>
+                
                 <div class="search-bar">
                     <i class="search-icon"></i>
-                    <input class="searchBox" name="search" type="text"/>
+                    <input class="searchBox" id="search" type="text"/>
                 </div>
             </div>
     </body>

@@ -38,7 +38,7 @@ namespace VisualParser
                 default:
                     throw new NotSupportedException();
             }
-            LocatorStartUp.Launch(driver);
+            Locator.Locator.Launch(driver);
         }
     }
 }

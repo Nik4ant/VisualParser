@@ -32,10 +32,10 @@ namespace VisualParser.Locator
                 bytes1.Length > bytes2.Length ? bytes1 : bytes2).Length;
             int minLengthToReplace = bytesToReplace.Keys.Min(bytes => bytes.Length);
             // Creating file with size of current driver (for easier memory management)
-            long currentDriverFileSize = new FileInfo(Globals.PathToDriver).Length;
+            long currentDriverFileSize = new FileInfo(Globals.PathToDriverBinary).Length;
             // TODO: bench this thing as well
             using var binaryWriter = new BinaryWriter(File.Create(tempDriverPath, (int)currentDriverFileSize));
-            using var binaryReader = new BinaryReader(File.OpenRead(Globals.PathToDriver));
+            using var binaryReader = new BinaryReader(File.OpenRead(Globals.PathToDriverBinary));
             // Chunk with current data from BinaryReader
             byte[] bufferChunk = binaryReader.ReadBytes(bufferChunkSize);
             // TODO: bench 2 versions:
@@ -64,7 +64,7 @@ namespace VisualParser.Locator
             binaryWriter.Write(binaryReader.ReadBytes(maxLengthToReplace));
             binaryWriter.Close();
             binaryReader.Close();
-            File.Move(tempDriverPath, Globals.PathToDriver, true);
+            File.Move(tempDriverPath, Globals.PathToDriverBinary, true);
             */
         }
 
@@ -75,7 +75,9 @@ namespace VisualParser.Locator
             // ColoredConsole.WriteLine("Driver binary was formatted successful!", ConsoleColor.Green);
             List<string> chromeArgumentsToAdd = new List<string> {
                 "start-maximized",
-                $"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{Globals.CurrentUserInfo.BrowserVersion} Safari/537.36",
+                "--no-sandbox",
+                "--disable-blink-features",
+                "--disable-blink-features=AutomationControlled",
             };
             // Arguments to remove from driver's default arguments list
             List<string> chromeArgumentsToExclude = new List<string> {
@@ -89,12 +91,13 @@ namespace VisualParser.Locator
                 "disable-popup-blocking",
                 "disable-prompt-on-repost",
                 "enable-blink-features=ShadowDOMV0",
+                "enable-blink-features=AutomationControlled",
                 "log-level=0", 
                 "disable-sync",
             };
             // Capabilities
             Dictionary<string, object> chromeCapabilities = new Dictionary<string, object> {
-                {"useAutomationExtension", false},
+                
             };
             // Options for driver
             var driverOptions = new ChromeOptions {
@@ -111,9 +114,19 @@ namespace VisualParser.Locator
             // TODO: add profile creation feature (it reads all data from main profile, but i will be profile for parsing)
             // Internet speed throughput for driver in kb/s
             // long internetSpeedForDriver = CalculateInternetThroughput();
-            
             // Driver
-            return new ChromeDriver(Globals.PathToDriverFolder, driverOptions);
+            var driver = new ChromeDriver(Globals.PathToDriverFolder, driverOptions);
+            // Command to hide "navigator" property and be undetected
+            driver.ExecuteChromeCommand("Page.addScriptToEvaluateOnNewDocument", 
+                new Dictionary<string, object> {
+                    {"source", "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"}
+            });
+            // User agent
+            driver.ExecuteChromeCommand("Network.setUserAgentOverride", 
+                new Dictionary<string, object> {
+                    {"userAgent", $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{Globals.CurrentUserInfo.BrowserVersion} Safari/537.36"}
+            });
+            return driver;
             /*
              Note(Nik4ant): Need better params for this later. Now it just slows all down 
             NetworkConditions = new ChromeNetworkConditions {
