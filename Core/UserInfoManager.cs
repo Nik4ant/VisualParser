@@ -8,22 +8,27 @@ namespace VisualParser.Core
 {
     public static class UserInfoManager {
         /// <summary>
-        /// Method formats given browser name and sets appropriate BrowserType
+        /// Method formats given browser name and sets appropriate BrowserType.
+        /// Also for linux sets different browser name because of OS depended stuff)
         /// </summary>
         /// <param name="browserName">Browser name</param>
+        /// <param name="linuxBrowserName">Browser name for linux only</param>
         /// <param name="type">out param browser type</param>
         /// <returns>Formatted browser name</returns>
-        private static string FormatBrowserName(string browserName, out BrowserType type) {
+        private static string FormatBrowserName(string browserName, out string linuxBrowserName, out BrowserType type) {
             // Default values
             string formattedName = browserName.ToLower().Trim();
+            linuxBrowserName = browserName.ToLower().Trim();
             type = BrowserType.None;
 
             if (formattedName.Contains("chrome")) {
                 type = BrowserType.Chrome;
+                linuxBrowserName = "google-chrome";
                 return "chrome";
             }
             if (formattedName.Contains("firefox")) {
                 type = BrowserType.Firefox;
+                linuxBrowserName = "firefox";
                 return "firefox";
             }
             
@@ -36,7 +41,7 @@ namespace VisualParser.Core
         /// <returns>User's default browser name</returns>
         private static string GetDefaultBrowserName() {
             if (Globals.CurrentUserInfo.OS == OSPlatform.Windows) {
-                // Path in register of http handler (default browser)
+                // Path in register of https handler (in this case default browser)
                 const string keyName = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\URLAssociations\http\UserChoice";
                 return Utils.GetTerminalData("powershell", 
                     $"/command Get-ItemProperty -Path Registry::{keyName} -Name \"ProgId\" | Select -ExpandProperty \"ProgId\"");
@@ -53,21 +58,24 @@ namespace VisualParser.Core
 
         /// <summary>
         /// Method gets version of given browser by it's formatted and unformatted names
-        /// (Depending on OS need different name. For example on Windows need formatted name)
+        /// (Depending on OS need different name)
         /// </summary>
         /// <param name="formattedBrowserName">Formatted name of browser</param>
-        /// <param name="unformattedBrowserName">Unformatted name of browser</param>
+        /// <param name="linuxOnlyBrowserName">Browser name for linux only</param>
         /// <returns>Browser's version</returns>
-        private static string GetBrowserVersion(string formattedBrowserName, string unformattedBrowserName) {
+        private static string GetBrowserVersion(string formattedBrowserName, string linuxOnlyBrowserName) {
             if (Globals.CurrentUserInfo.OS == OSPlatform.Windows) {
-                // Path in register for getting browser's version
-                string keyVersion = $@"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{formattedBrowserName}.exe";
+                const string registryPathBase = @"HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*";
+                const string registryPath64Bit = @"HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*";
                 // Parse version
-                return Utils.GetTerminalData("powershell", 
-                    $"/command (Get-Item (Get-ItemProperty '{keyVersion}').'(Default)').VersionInfo.ProductVersion");
+                if (Environment.Is64BitOperatingSystem) 
+                    return Utils.GetTerminalData("powershell", $"/command (Get-ItemProperty {registryPathBase}, {registryPath64Bit} | select DisplayName, DisplayVersion | where DisplayName -Like \"*{formattedBrowserName}*\").DisplayVersion");
+                return Utils.GetTerminalData("powershell", $"/command (Get-ItemProperty {registryPathBase} | select DisplayName, DisplayVersion | where DisplayName -Like \"*{formattedBrowserName}*\").DisplayVersion");
             }
             if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
-                return Utils.GetTerminalData("/bin/bash", $"{unformattedBrowserName} --version");
+                // FIXME: For chrome this is "google-chrome --version"
+                // https://linuxhint.com/check-google-chrome-browser-version/
+                return Utils.GetTerminalData("/bin/bash", $"{linuxOnlyBrowserName} --version");
             }
             throw new NotSupportedException("Are you running this on toaster?!?!");
         }
@@ -91,6 +99,7 @@ namespace VisualParser.Core
                         Console.WriteLine("Updating data manually...");
                         Update();
                         SaveToJson(Globals.AppDataFilename);
+                        ColoredConsole.WriteLine("Data were updated and saved to .json", ConsoleColor.Green);
                     }
                     return;
                 }
@@ -106,10 +115,12 @@ namespace VisualParser.Core
         /// </summary>
         private static void Update() {
             // Collecting formatted browser's name and type
-            string unformattedBrowserName = GetDefaultBrowserName();
-            string formattedBrowserName = FormatBrowserName(unformattedBrowserName, out var newBrowserType);
+            // (For different OS same browser can have different names.
+            // For example "*chrome*" on windows and "google-chrome" on linux)
+            string formattedBrowserName = FormatBrowserName(GetDefaultBrowserName(), 
+                out var linuxOnlyBrowserName, out var newBrowserType);
             // Updating data
-            Update(formattedBrowserName, GetBrowserVersion(formattedBrowserName, unformattedBrowserName), 
+            Update(formattedBrowserName, GetBrowserVersion(formattedBrowserName, linuxOnlyBrowserName), 
                 newBrowserType);
         }
         
