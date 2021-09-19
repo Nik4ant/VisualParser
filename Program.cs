@@ -7,7 +7,6 @@ using VisualParser.Locator;
 namespace VisualParser
 {
     static class Program {
-        
         static void Main(string[] args) {
             // Processing all needed info
             UserInfoManager.HandleInfo();

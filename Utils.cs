@@ -60,6 +60,7 @@ namespace VisualParser
     }
 
     static class Extensions {
+        // TODO: do benchmark for test if i'll use it
         public static byte[] ToByteArray(this string text) {
             var result = new byte[text.Length];
             // Index for writing to result

@@ -15,20 +15,15 @@ namespace VisualParser.Locator
         }
         
         /// <summary>
-        /// Method waits for attribute change in element by given selector
-        /// and returns new attribute value
+        /// Method waits for url to change and returns new url
         /// (Method waits without timeout)
         /// </summary>
-        /// <param name="driver">Driver</param>
-        /// <param name="elementSelector">Selector for element with attribute</param>
-        /// <param name="attributeName">Attribute's name</param>
-        /// <param name="attributeOldValue">Old attribute value</param>
-        /// <returns>New attribute value</returns>
-        public static string WaitForAttributeChange(RemoteWebDriver driver, By elementSelector, 
-            string attributeName, string attributeOldValue) {
-            var element = driver.FindElement(elementSelector);
-            new WebDriverWait(driver, TimeSpan.FromDays(365)).Until(x => element.GetAttribute(attributeName) != attributeOldValue);
-            return element.GetAttribute(attributeName);
+        /// <param name="webDriver">Driver</param>
+        /// <returns>New url</returns>
+        public static string WaitForUrlChange(RemoteWebDriver webDriver) {
+            string oldUrl = webDriver.Url;
+            new WebDriverWait(webDriver, TimeSpan.FromDays(365)).Until(driver => driver.Url != oldUrl);
+            return webDriver.Url;
         }
         
         // Note(Nik4ant): This is useless for now maybe will help in the future
