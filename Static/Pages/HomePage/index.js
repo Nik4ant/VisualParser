@@ -7,17 +7,18 @@
     }
     return url.protocol === "http:" || url.protocol === "https:";
 }
-function displayErrorMessage(text) {
-    alert(text);
-    // <div class="bar error">Error message</div>
+function displayErrorMessage() {
+    document.getElementById("wrong_id_error").setAttribute("class", "error-message");
 }
 function handleParserStart() {
     if (isUrlValid(search_node.value)) {
-        // Setting the attribute value so that  C# code with selenium
-        // can see parser start event
-        button_start.setAttribute("url_to_parse", search_node.value);
+        document.getElementById("wrong_id_error").setAttribute("class", "error-message hidden");
+        // Redirecting user to inputted url, so:
+        // 1) New page will be opened
+        // 2) C# code with selenium will be notified of url change
+        window.location.replace(search_node.value)
     }
-    else { displayErrorMessage(invalidUrlErrorText); }
+    else { displayErrorMessage(); }
 }
 
 const getElement = async element_id => {
@@ -28,7 +29,6 @@ const getElement = async element_id => {
 };
 let search_node = null;
 let button_start = null;
-const invalidUrlErrorText = "Error! Invalid url";
 // Search (input tag)
 getElement("search").then((element) => {
     search_node = element;
