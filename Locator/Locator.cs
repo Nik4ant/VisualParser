@@ -19,9 +19,13 @@ namespace VisualParser.Locator
             string urlToParse = LocatorUtils.WaitForUrlChange(driver);
             ColoredConsole.Debug($"Your url to parse is: {urlToParse}");
             ColoredConsole.Debug("But that's doesn't matter, because we will rickroll you anyway");
-            // Rickroll :D
+            /*
+            Don't think that's good idea to have this on demonstration...
+            I'll use this rickroll later :D
+
             driver.Navigate().GoToUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
             driver.FindElementByCssSelector("#movie_player > div.ytp-cued-thumbnail-overlay > button").Click();
+            */
         }
     }
 }
