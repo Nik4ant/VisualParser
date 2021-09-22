@@ -13,7 +13,6 @@
     <ItemGroup>
       <Folder Include="Drivers" />
       <Folder Include="Static" />
-      <Folder Include="Static\Scripts" />
     </ItemGroup>
 
 </Project>

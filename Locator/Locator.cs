@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Resources;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
-using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium.Support;
+using VisualParser.Core;
 
 namespace VisualParser.Locator
 {
@@ -14,11 +16,12 @@ namespace VisualParser.Locator
             Driver = driver;
             // TODO: for no reason appears extension in browser?!?!?!??!???!?!?!!!?!?!?!?!?!?!?!???!?!?!?!!?!?!!?!??
             // Open home page
-            Driver.Navigate().GoToUrl(Globals.GetPageUri($"Pages{Path.DirectorySeparatorChar}HomePage", "index.html"));
+            Driver.Navigate().GoToUrl(StaticManager.GetPageUri($"Pages{Path.DirectorySeparatorChar}HomePage", "index.html"));
             // Waiting for parser to start. It starts if JS on page redirects user
             string urlToParse = LocatorUtils.WaitForUrlChange(driver);
-            ColoredConsole.Debug($"Your url to parse is: {urlToParse}");
-            ColoredConsole.Debug("But that's doesn't matter, because we will rickroll you anyway");
+            ColoredConsole.WriteLine($"Your url to parse is: {urlToParse}", ConsoleColor.Green);
+            // Inserting some js code for demonstration
+            LocatorUtils.ExecuteScriptFromFile(Driver, StaticManager.GetItemPath("Scripts", "selector.js"));
             /*
             Don't think that's good idea to have this on demonstration...
             I'll use this rickroll later :D

@@ -8,7 +8,6 @@ using OpenQA.Selenium.Support.UI;
 namespace VisualParser.Locator
 {
     public static class LocatorUtils {
-        // TODO: REMOVE THIS ******* PIECE OF ****
         public static object ExecuteScriptFromFile(RemoteWebDriver driver, string pathToJSFile, 
                 params object[] arguments) {
             return driver.ExecuteScript(File.ReadAllText(pathToJSFile), arguments);

@@ -29,38 +29,38 @@ namespace VisualParser.Core
         /// <param name="browserVersion">Version of browser</param>
         /// <returns>true if driver is new (was downloaded recently) otherwise false</returns>
         protected bool _Load(string browserVersion) {
-            ColoredConsole.WriteLine("Looking for a driver...", ConsoleColor.DarkYellow);
+            Console.WriteLine("Looking for a driver...");
             // Creating "Drivers" folder if it doesn't exists
             // TODO: for no reason Linux might crash there (research)
-            Directory.CreateDirectory(Globals.PathToDriverFolder);
+            Directory.CreateDirectory(Globals.AppInfo.PathToDriverFolder);
             // Check if driver is downloaded already
-            if (Directory.GetFiles(Globals.PathToDriverFolder).Length != 0) {
+            if (Directory.GetFiles(Globals.AppInfo.PathToDriverFolder).Length != 0) {
                 // If driver is already there setting path to driver
-                Globals.SetPathToDriverBinary();
+                Globals.AppInfo.SetPathToDriverBinary();
                 // If user want to override existing driver old one will be deleted
                 bool overrideFile = Utils.AskUserInput("Driver already exist, do you want to override it? [y/n] ", 
                     ConsoleColor.Yellow);
                 if (!overrideFile)
                     return false;
                 // To make sure program delete all files inside Driver folder
-                foreach (string path in Directory.GetFiles(Globals.PathToDriverFolder))
+                foreach (string path in Directory.GetFiles(Globals.AppInfo.PathToDriverFolder))
                     File.Delete(path);
-                ColoredConsole.WriteLine("Old driver deleted, downloading new one...", ConsoleColor.DarkYellow);
+                ColoredConsole.WriteLine("Old driver deleted, downloading new one...", ConsoleColor.Yellow);
             }
             // Relative and absolute paths to .zip with downloaded driver
-            string pathToDriver = Globals.PathToDriverFolder + $"{Path.DirectorySeparatorChar}driver.zip";
+            string pathToDriver = Globals.AppInfo.PathToDriverFolder + $"{Path.DirectorySeparatorChar}driver.zip";
             // Downloading driver
             Utils.DownloadFileByUrl(_GetDownloadUrl(browserVersion), Path.GetFullPath(pathToDriver));
             // Extracting downloaded .zip
             try {
-                ZipFile.ExtractToDirectory(pathToDriver, Globals.PathToDriverFolder);
-                ColoredConsole.WriteLine($"[Green]Driver was loaded[/Green]. Relative path to folder: [Yellow]{Globals.PathToDriverFolder}[/Yellow]");
+                ZipFile.ExtractToDirectory(pathToDriver, Globals.AppInfo.PathToDriverFolder);
+                ColoredConsole.WriteLine($"[Green]Driver was loaded[/Green]. Relative path to folder: [Yellow]{Globals.AppInfo.PathToDriverFolder}[/Yellow]");
                 // Setting path to driver after it was downloaded
-                Globals.SetPathToDriverBinary();
+                Globals.AppInfo.SetPathToDriverBinary();
             }
             catch (IOException) {
                 ColoredConsole.WriteLine("[Red]ERROR![/Red] Driver is downloaded already or something went wrong");
-                ColoredConsole.WriteLine($"Relative path to folder: [Red]{Globals.PathToDriverFolder}[/Red]");
+                ColoredConsole.WriteLine($"Relative path to folder: [Red]{Globals.AppInfo.PathToDriverFolder}[/Red]");
             }
             // Removing .zip file
             File.Delete(pathToDriver);
@@ -85,13 +85,13 @@ namespace VisualParser.Core
             // Adding driver version to url
             downloadUrl.Append($"{driversVersions[browserVersion.Split('.')[0]]}/");
             // Adding filename for each platform
-            if (Globals.CurrentUserInfo.OS == OSPlatform.Windows) {
+            if (Globals.UserInfo.OS == OSPlatform.Windows) {
                 downloadUrl.Append("chromedriver_win32.zip");
             }
-            else if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
+            else if (Globals.UserInfo.OS == OSPlatform.Linux) {
                 downloadUrl.Append("chromedriver_linux64.zip");
             }
-            else if (Globals.CurrentUserInfo.OS == OSPlatform.OSX) {
+            else if (Globals.UserInfo.OS == OSPlatform.OSX) {
                 downloadUrl.Append("chromedriver_mac64.zip");
             }
             
@@ -137,7 +137,6 @@ namespace VisualParser.Core
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(new HtmlWeb().Load(CompatibleVersionLink).Text);
             // Major version of browser
-            ColoredConsole.Debug(browserVersion.Split('.')[0]);
             short searchingBrowserVersion = short.Parse(browserVersion.Split('.')[0]);
             // Selecting first driver version that match to given browser version
             var tableNode = htmlDoc.DocumentNode.SelectSingleNode("//*[@id=\"supported-platforms\"]/table");
@@ -157,13 +156,13 @@ namespace VisualParser.Core
                 }
             }
             // Adding OS to download url
-            if (Globals.CurrentUserInfo.OS == OSPlatform.Windows) {
+            if (Globals.UserInfo.OS == OSPlatform.Windows) {
                 downloadUrl.Append("win32.zip");
             }
-            else if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
+            else if (Globals.UserInfo.OS == OSPlatform.Linux) {
                 downloadUrl.Append("linux32.tar.gz");
             }
-            else if (Globals.CurrentUserInfo.OS == OSPlatform.OSX) {
+            else if (Globals.UserInfo.OS == OSPlatform.OSX) {
                 downloadUrl.Append("macos.tar.gz");
             }
             else {

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace VisualParser.Data
 {
-    public class UserInfoContainer {
+    public class UserInfoContainer : BaseContainer<UserInfoContainer> {
         // User's OS
         [JsonIgnore]
         public OSPlatform OS { get; }

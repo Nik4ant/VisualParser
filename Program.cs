@@ -10,34 +10,24 @@ namespace VisualParser
         static void Main(string[] args) {
             // Processing all needed info
             UserInfoManager.HandleInfo();
-            ColoredConsole.WriteLine($"Name: [Yellow]{Globals.CurrentUserInfo.BrowserName}[/Yellow]");
-            ColoredConsole.WriteLine($"Version: [Yellow]{Globals.CurrentUserInfo.BrowserVersion}[/Yellow]\n");
+            ColoredConsole.WriteLine($"Name: [Yellow]{Globals.UserInfo.BrowserName}[/Yellow]");
+            ColoredConsole.WriteLine($"Version: [Yellow]{Globals.UserInfo.BrowserVersion}[/Yellow]\n");
             // Driver for locator (will be init down below)
             RemoteWebDriver driver = default;
             // Handling each driver before launching locator
-            switch (Globals.CurrentUserInfo.Browser) {
+            switch (Globals.UserInfo.Browser) {
                 case BrowserType.Chrome:
-                    bool isDriverLoadedRecently = ChromeDriverLoader.Load(Globals.CurrentUserInfo.BrowserVersion);
+                    bool isDriverLoadedRecently = ChromeDriverLoader.Load(Globals.UserInfo.BrowserVersion);
                     driver = DriverManager.GetConfiguredChromeDriver(isDriverLoadedRecently);
                     break;
-                case BrowserType.Firefox:
-                    FirefoxDriverLoader.Load(Globals.CurrentUserInfo.BrowserVersion);
-                    ColoredConsole.Debug("Only driver loading process working now");
-                    throw new NotImplementedException();
-                    break;
-                case BrowserType.Edge:
-                    throw new NotImplementedException();
-                    break;
-                case BrowserType.Opera:
-                    throw new NotImplementedException();
-                    break;
-                case BrowserType.Safari:
-                    throw new NotImplementedException();
-                    break;
                 default:
+                    ColoredConsole.WriteLine("[Red]ERROR![/Red] Your browser isn't supported");
                     throw new NotSupportedException();
             }
             Locator.Locator.Launch(driver);
+            // Updating app info
+            // TODO: figure out better way for saving customizable stuff
+            Globals.AppInfo.SaveToJson(Globals.AppInfoFilename);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace VisualParser.Locator
         /// (For example it renames cdc_ string to avoid detection)
         /// </summary>
         private static void FormatChromeDriverBinary() {
-            ColoredConsole.Debug("DRIVER IS UNFORMATED, YOU CAN BE DETECTED!");
+            ColoredConsole.Warning("WARNING! DRIVER IS UNFORMATED, YOU CAN BE DETECTED!");
             return;
             // TODO: replace cdc_ string and all that stuff from .exe (please help)
             /*
@@ -101,7 +101,7 @@ namespace VisualParser.Locator
             };
             // Options for driver
             var driverOptions = new ChromeOptions {
-                BrowserVersion = Globals.CurrentUserInfo.BrowserVersion,
+                BrowserVersion = Globals.UserInfo.BrowserVersion,
                 PageLoadStrategy = PageLoadStrategy.Eager,
             };
             // Arguments
@@ -115,7 +115,7 @@ namespace VisualParser.Locator
             // Internet speed throughput for driver in kb/s
             // long internetSpeedForDriver = CalculateInternetThroughput();
             // Driver
-            var driver = new ChromeDriver(Globals.PathToDriverFolder, driverOptions);
+            var driver = new ChromeDriver(Globals.AppInfo.PathToDriverFolder, driverOptions);
             // Command to hide "navigator" property and be undetected
             driver.ExecuteChromeCommand("Page.addScriptToEvaluateOnNewDocument", 
                 new Dictionary<string, object> {
@@ -124,7 +124,7 @@ namespace VisualParser.Locator
             // User agent
             driver.ExecuteChromeCommand("Network.setUserAgentOverride", 
                 new Dictionary<string, object> {
-                    {"userAgent", $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{Globals.CurrentUserInfo.BrowserVersion} Safari/537.36"}
+                    {"userAgent", $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{Globals.UserInfo.BrowserVersion} Safari/537.36"}
             });
             return driver;
             /*

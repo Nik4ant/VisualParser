@@ -143,8 +143,11 @@ namespace VisualParser
             Console.Write(text);
             Console.ForegroundColor = ConsoleColor.Gray;
         }
-
-        // Same as Write (with text only) but with '\n' at the end
+        
+        /// <summary>
+        /// Same as ColoredConsole.Write (without color param) but with '\n' at the end
+        /// </summary>
+        /// <param name="text">Text</param>
         public static void WriteLine(string text) {
             Write(text);
             Console.Write('\n');
@@ -155,6 +158,8 @@ namespace VisualParser
             Write(text, color);
             Console.Write('\n');
         }
+        
+        public static void Warning(string text) { WriteLine(text, ConsoleColor.DarkYellow); }
         
         public static void Debug(string text) { WriteLine(text, ConsoleColor.Red); }
     }

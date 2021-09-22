@@ -40,16 +40,16 @@ namespace VisualParser.Core
         /// </summary>
         /// <returns>User's default browser name</returns>
         private static string GetDefaultBrowserName() {
-            if (Globals.CurrentUserInfo.OS == OSPlatform.Windows) {
+            if (Globals.UserInfo.OS == OSPlatform.Windows) {
                 // Path in register of https handler (in this case default browser)
                 const string keyName = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\URLAssociations\http\UserChoice";
                 return Utils.GetTerminalData("powershell", 
                     $"/command Get-ItemProperty -Path Registry::{keyName} -Name \"ProgId\" | Select -ExpandProperty \"ProgId\"");
             }
-            if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
+            if (Globals.UserInfo.OS == OSPlatform.Linux) {
                 return Utils.GetTerminalData("/bin/bash", "xdg-settings get default-web-browser");;
             }
-            if (Globals.CurrentUserInfo.OS == OSPlatform.OSX) {
+            if (Globals.UserInfo.OS == OSPlatform.OSX) {
                 // TODO: test this command before actual code this
                 // plutil -p ~/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist | grep 'https' -b3 |awk 'NR==3 {split($4, arr, "\""); print arr[2]}'
             }
@@ -64,7 +64,7 @@ namespace VisualParser.Core
         /// <param name="linuxOnlyBrowserName">Browser name for linux only</param>
         /// <returns>Browser's version</returns>
         private static string GetBrowserVersion(string formattedBrowserName, string linuxOnlyBrowserName) {
-            if (Globals.CurrentUserInfo.OS == OSPlatform.Windows) {
+            if (Globals.UserInfo.OS == OSPlatform.Windows) {
                 const string registryPathBase = @"HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*";
                 const string registryPath64Bit = @"HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*";
                 // Parse version
@@ -72,7 +72,7 @@ namespace VisualParser.Core
                     return Utils.GetTerminalData("powershell", $"/command (Get-ItemProperty {registryPathBase}, {registryPath64Bit} | select DisplayName, DisplayVersion | where DisplayName -Like \"*{formattedBrowserName}*\").DisplayVersion");
                 return Utils.GetTerminalData("powershell", $"/command (Get-ItemProperty {registryPathBase} | select DisplayName, DisplayVersion | where DisplayName -Like \"*{formattedBrowserName}*\").DisplayVersion");
             }
-            if (Globals.CurrentUserInfo.OS == OSPlatform.Linux) {
+            if (Globals.UserInfo.OS == OSPlatform.Linux) {
                 // FIXME: For chrome this is "google-chrome --version"
                 // https://linuxhint.com/check-google-chrome-browser-version/
                 return Utils.GetTerminalData("/bin/bash", $"{linuxOnlyBrowserName} --version");
@@ -83,7 +83,7 @@ namespace VisualParser.Core
         public static void HandleInfo() {
             // This collects all needed data and store it to global info
             // object (static readonly Instance of UserInfoContainer)
-            if (File.Exists(Globals.AppDataFilename)) {
+            if (File.Exists(Globals.UserInfoFilename)) {
                 // Json data might become old after browser update, so have to ask user
                 bool useJsonData = Utils.AskUserInput("Use old .json data? [y/n] ", 
                     ConsoleColor.Yellow);
@@ -92,25 +92,25 @@ namespace VisualParser.Core
                     // If program can't load data from .json file it will update manually
                     // and save new data to .json
                     try {
-                        Update(Globals.AppDataFilename);
+                        Update(Globals.UserInfoFilename);
                     }
                     catch (Exception e) {
                         ColoredConsole.WriteLine("[Red]ERROR![/Red] Bad data or something went wrong");
                         Console.WriteLine("Updating data manually...");
                         Update();
-                        SaveToJson(Globals.AppDataFilename);
+                        Globals.UserInfo.SaveToJson(Globals.UserInfoFilename);
                         ColoredConsole.WriteLine("Data were updated and saved to .json", ConsoleColor.Green);
                     }
                     return;
                 }
             }
             Update();
-            SaveToJson(Globals.AppDataFilename);
+            Globals.UserInfo.SaveToJson(Globals.UserInfoFilename);
         }
         
         #region Update methods overloads
         /// <summary>
-        /// Method gets current user's info and store it to Globals.CurrentUserInfo
+        /// Method gets current user's info and store it to Globals.UserInfo
         /// (All collected info described in Data/UserInfoContainer.cs class)
         /// </summary>
         private static void Update() {
@@ -125,7 +125,7 @@ namespace VisualParser.Core
         }
         
         /// <summary>
-        /// Method store given data to Globals.CurrentUserInfo
+        /// Method store given data to Globals.UserInfo
         /// (All collected info described in Data/UserInfoContainer.cs class)
         /// </summary>
         /// <param name="browserName">User's default browser name</param>
@@ -137,24 +137,13 @@ namespace VisualParser.Core
         }
         
         /// <summary>
-        /// Method loads user's info from json file and store it to Globals.CurrentUserInfo
+        /// Method loads user's info from json file and store it to Globals.UserInfo
         /// (All collected info described in Data/UserInfoContainer.cs class)
         /// </summary>
         /// <param name="pathToJson">Path to json file</param>
         private static void Update(string pathToJson) {
-            var loadedContainer = LoadFromJson(pathToJson);
-            Globals.SetUserInfo(loadedContainer.BrowserName, loadedContainer.BrowserVersion, 
-                loadedContainer.Browser);
-        }
-        #endregion
-        
-        #region Json save/load
-        private static UserInfoContainer LoadFromJson(string path) { 
-            return JsonSerializer.Deserialize<UserInfoContainer>(File.ReadAllText(path));
-        }
-
-        private static void SaveToJson(string path) {
-            File.WriteAllText(path, JsonSerializer.Serialize(Globals.CurrentUserInfo));
+            var loadedContainer = UserInfoContainer.LoadFromJson(pathToJson);
+            Globals.SetUserInfo(loadedContainer);
         }
         #endregion
     }
