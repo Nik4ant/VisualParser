@@ -56,6 +56,10 @@ body {
 }
 
 .error-message {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0.3s linear, opacity 0.3s linear;
+    
     padding: 5px;
     margin-top: 10px;
     color: #ba3939;

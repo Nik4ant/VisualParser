@@ -7,21 +7,27 @@ function isUrlValid(string) {
     } catch (_) {
         return false;
     }
-    console.log(url.protocol);
     return allowed_protocols_list.includes(url.protocol);
 }
-function displayErrorMessage() {
-    document.getElementById("wrong_id_error").setAttribute("class", "error-message");
+function displayErrorMessage(text) {
+    error_message_node.style.visibility = "visible";
+    error_message_node.style.opacity = "1";
+    error_message_node.innerText = text;
 }
 function handleParserStart() {
-    if (isUrlValid(search_node.value)) {
-        document.getElementById("wrong_id_error").setAttribute("class", "error-message hidden");
+    // Warning user if he want to parse current page
+    if (search_node.value === document.URL) {
+        displayErrorMessage("ERROR! You can't parse current page")
+    }
+    else if (isUrlValid(search_node.value)) {
+        error_message_node.style.visibility = "hidden";
+        error_message_node.style.opacity = "0";
         // Redirecting user to inputted url, so:
         // 1) New page will be opened
         // 2) C# code with selenium will be notified of url change
         window.location.replace(search_node.value)
     }
-    else { displayErrorMessage(); }
+    else { displayErrorMessage("ERROR! Invalid url!"); }
 }
 
 const getElement = async element_id => {
@@ -30,6 +36,7 @@ const getElement = async element_id => {
     }
     return document.getElementById(element_id);
 };
+let error_message_node = null;
 let search_node = null;
 let button_start = null;
 // Search (input tag)
@@ -44,4 +51,8 @@ getElement("search").then((element) => {
 getElement("parser-start").then((element) => {
     button_start = element;
     button_start.addEventListener("click", handleParserStart);
+});
+// Error message
+getElement("wrong_id_error").then((element) => {
+    error_message_node = element;
 });
