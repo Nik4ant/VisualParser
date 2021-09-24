@@ -1,11 +1,14 @@
-﻿function isUrlValid(string) {
+﻿const allowed_protocols_list = ["http:", "https:", "file:"]
+
+function isUrlValid(string) {
     let url;
     try {
         url = new URL(string);
     } catch (_) {
         return false;
     }
-    return url.protocol === "http:" || url.protocol === "https:";
+    console.log(url.protocol);
+    return allowed_protocols_list.includes(url.protocol);
 }
 function displayErrorMessage() {
     document.getElementById("wrong_id_error").setAttribute("class", "error-message");

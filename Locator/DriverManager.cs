@@ -97,11 +97,12 @@ namespace VisualParser.Locator
             };
             // Capabilities
             Dictionary<string, object> chromeCapabilities = new Dictionary<string, object> {
-                
+                // TODO: figure out how to remove security extension from browser
+                // {"chrome.switches", new List<string>{"--disable-extensions"}},
             };
             // Options for driver
             var driverOptions = new ChromeOptions {
-                BrowserVersion = Globals.UserInfo.BrowserVersion,
+                BrowserVersion = Globals.AppInfo.User.BrowserVersion,
                 PageLoadStrategy = PageLoadStrategy.Eager,
             };
             // Arguments
@@ -124,7 +125,7 @@ namespace VisualParser.Locator
             // User agent
             driver.ExecuteChromeCommand("Network.setUserAgentOverride", 
                 new Dictionary<string, object> {
-                    {"userAgent", $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{Globals.UserInfo.BrowserVersion} Safari/537.36"}
+                    {"userAgent", $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{Globals.AppInfo.User.BrowserVersion} Safari/537.36"}
             });
             return driver;
             /*

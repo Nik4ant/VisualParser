@@ -9,15 +9,15 @@ namespace VisualParser
     static class Program {
         static void Main(string[] args) {
             // Processing all needed info
-            UserInfoManager.HandleInfo();
-            ColoredConsole.WriteLine($"Name: [Yellow]{Globals.UserInfo.BrowserName}[/Yellow]");
-            ColoredConsole.WriteLine($"Version: [Yellow]{Globals.UserInfo.BrowserVersion}[/Yellow]\n");
+            InfoManager.HandleInfo();
+            ColoredConsole.WriteLine($"Name: [Yellow]{Globals.AppInfo.User.BrowserName}[/Yellow]");
+            ColoredConsole.WriteLine($"Version: [Yellow]{Globals.AppInfo.User.BrowserVersion}[/Yellow]\n");
             // Driver for locator (will be init down below)
             RemoteWebDriver driver = default;
             // Handling each driver before launching locator
-            switch (Globals.UserInfo.Browser) {
+            switch (Globals.AppInfo.User.Browser) {
                 case BrowserType.Chrome:
-                    bool isDriverLoadedRecently = ChromeDriverLoader.Load(Globals.UserInfo.BrowserVersion);
+                    bool isDriverLoadedRecently = ChromeDriverLoader.Load(Globals.AppInfo.User.BrowserVersion);
                     driver = DriverManager.GetConfiguredChromeDriver(isDriverLoadedRecently);
                     break;
                 default:
@@ -25,9 +25,6 @@ namespace VisualParser
                     throw new NotSupportedException();
             }
             Locator.Locator.Launch(driver);
-            // Updating app info
-            // TODO: figure out better way for saving customizable stuff
-            Globals.AppInfo.SaveToJson(Globals.AppInfoFilename);
         }
     }
 }

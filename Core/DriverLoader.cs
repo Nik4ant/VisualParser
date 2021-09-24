@@ -17,35 +17,35 @@ namespace VisualParser.Core
     2) For easier use there is public static method Load
     (instead of calling if from Instance field)
     
-    Can't find better solution.
+    Can't find any better solution.
+    Feature that easily solve this problem will be added in .NET6:
+    https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/static-abstract-interface-methods
     */
 
     class BaseDriverLoader {
         /// <summary>
         /// Method that downloads driver that matches given browser version
         /// and return true if driver is new (was downloaded recently) otherwise false
-        /// (used to format driver. If driver is new it needs to be formated)  
         /// </summary>
         /// <param name="browserVersion">Version of browser</param>
-        /// <returns>true if driver is new (was downloaded recently) otherwise false</returns>
+        /// <returns>true if driver is new (was downloaded recently) otherwise false.
+        /// Used to format driver. If driver is new it needs to be formated</returns>
         protected bool _Load(string browserVersion) {
             Console.WriteLine("Looking for a driver...");
             // Creating "Drivers" folder if it doesn't exists
-            // TODO: for no reason Linux might crash there (research)
+            // TODO: check if Linux still crashes there
             Directory.CreateDirectory(Globals.AppInfo.PathToDriverFolder);
             // Check if driver is downloaded already
-            if (Directory.GetFiles(Globals.AppInfo.PathToDriverFolder).Length != 0) {
-                // If driver is already there setting path to driver
-                Globals.AppInfo.SetPathToDriverBinary();
+            if (Globals.AppInfo.PathToDriverBinary != null) {
                 // If user want to override existing driver old one will be deleted
-                bool overrideFile = Utils.AskUserInput("Driver already exist, do you want to override it? [y/n] ", 
+                bool overrideFile = Utils.AskUserInput("Driver already exist, do you want to override it? [y/n] ",
                     ConsoleColor.Yellow);
                 if (!overrideFile)
                     return false;
                 // To make sure program delete all files inside Driver folder
                 foreach (string path in Directory.GetFiles(Globals.AppInfo.PathToDriverFolder))
                     File.Delete(path);
-                ColoredConsole.WriteLine("Old driver deleted, downloading new one...", ConsoleColor.Yellow);
+                Console.WriteLine("Old driver deleted, downloading new one...");
             }
             // Relative and absolute paths to .zip with downloaded driver
             string pathToDriver = Globals.AppInfo.PathToDriverFolder + $"{Path.DirectorySeparatorChar}driver.zip";
@@ -55,15 +55,17 @@ namespace VisualParser.Core
             try {
                 ZipFile.ExtractToDirectory(pathToDriver, Globals.AppInfo.PathToDriverFolder);
                 ColoredConsole.WriteLine($"[Green]Driver was loaded[/Green]. Relative path to folder: [Yellow]{Globals.AppInfo.PathToDriverFolder}[/Yellow]");
+                // Removing .zip file
+                File.Delete(pathToDriver);
                 // Setting path to driver after it was downloaded
-                Globals.AppInfo.SetPathToDriverBinary();
+                Globals.AppInfo.UpdatePathToDriverBinary();
+                // Saving changes to .json
+                Globals.AppInfo.SaveToJson(Globals.AppInfoPath);
             }
             catch (IOException) {
-                ColoredConsole.WriteLine("[Red]ERROR![/Red] Driver is downloaded already or something went wrong");
+                ColoredConsole.WriteLine("[Red]ERROR![/Red] Something went wrong during downloading process");
                 ColoredConsole.WriteLine($"Relative path to folder: [Red]{Globals.AppInfo.PathToDriverFolder}[/Red]");
             }
-            // Removing .zip file
-            File.Delete(pathToDriver);
             return true;
         }
         
@@ -85,13 +87,13 @@ namespace VisualParser.Core
             // Adding driver version to url
             downloadUrl.Append($"{driversVersions[browserVersion.Split('.')[0]]}/");
             // Adding filename for each platform
-            if (Globals.UserInfo.OS == OSPlatform.Windows) {
+            if (Globals.AppInfo.User.OS == OSPlatform.Windows) {
                 downloadUrl.Append("chromedriver_win32.zip");
             }
-            else if (Globals.UserInfo.OS == OSPlatform.Linux) {
+            else if (Globals.AppInfo.User.OS == OSPlatform.Linux) {
                 downloadUrl.Append("chromedriver_linux64.zip");
             }
-            else if (Globals.UserInfo.OS == OSPlatform.OSX) {
+            else if (Globals.AppInfo.User.OS == OSPlatform.OSX) {
                 downloadUrl.Append("chromedriver_mac64.zip");
             }
             
@@ -156,13 +158,13 @@ namespace VisualParser.Core
                 }
             }
             // Adding OS to download url
-            if (Globals.UserInfo.OS == OSPlatform.Windows) {
+            if (Globals.AppInfo.User.OS == OSPlatform.Windows) {
                 downloadUrl.Append("win32.zip");
             }
-            else if (Globals.UserInfo.OS == OSPlatform.Linux) {
+            else if (Globals.AppInfo.User.OS == OSPlatform.Linux) {
                 downloadUrl.Append("linux32.tar.gz");
             }
-            else if (Globals.UserInfo.OS == OSPlatform.OSX) {
+            else if (Globals.AppInfo.User.OS == OSPlatform.OSX) {
                 downloadUrl.Append("macos.tar.gz");
             }
             else {

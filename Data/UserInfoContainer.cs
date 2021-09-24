@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace VisualParser.Data
 {
-    public class UserInfoContainer : BaseContainer<UserInfoContainer> {
+    public class UserInfoContainer {
         // User's OS
         [JsonIgnore]
         public OSPlatform OS { get; }
