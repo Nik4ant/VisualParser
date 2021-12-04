@@ -115,41 +115,35 @@ namespace VisualParser.Core
                 ColorConsole.Error("Couldn't get selected file! Try again");
             }
             // In case if user hasn't chrome
-            ColorConsole.Warning("Program can automatically install chrome browser (NOT RECOMMENDED)");
-            // Auto installation or "semi auto" installation
-            if (Utils.AskUserInput("Use automatic installation? [y/n]")) {
-                // TODO: auto install stuff
-            }
-            else {
-                // Install and run chrome installer for the user, if he wants so
-                ColorConsole.Warning("Program will install latest chrome installer and run it for you");
-                if (Utils.AskUserInput("Install and run chrome installer? [y/n]")) {
-                    string installerFilename;
-                    if (Environment.Is64BitOperatingSystem) {
-                        Utils.DownloadFileByUrl("https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BB772F1AF-7BAF-C006-B980-CC577C94EBC7%7D%26lang%3Den%26browser%3D3%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable-statsdef_1%26installdataindex%3Dempty/chrome/install/ChromeStandaloneSetup64.exe", 
-                            ".");
-                        installerFilename = "ChromeStandaloneSetup64.exe";
-                    }
-                    else {
-                        Utils.DownloadFileByUrl("https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BB772F1AF-7BAF-C006-B980-CC577C94EBC7%7D%26lang%3Den%26browser%3D3%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dstable-arch_x86-statsdef_1%26installdataindex%3Dempty/chrome/install/ChromeStandaloneSetup.exe", 
-                            ".");
-                        installerFilename = "ChromeStandaloneSetup.exe";
-                    }
-                    // Running installer and removing it after it was closed
-                    var process = Process.Start(new ProcessStartInfo {
-                        CreateNoWindow = false,
-                        FileName = installerFilename
-                    });
-                    process!.WaitForExit();
-                    process.Dispose();
-                    File.Delete(installerFilename);
+            ColorConsole.Warning("Program can automatically install chrome browser (!!!NOT RECOMMENDED!!!)");
+            // Install and run chrome installer for the user, if he wants so
+            // ("Semi auto" installation)
+            ColorConsole.Warning("Program can install latest chrome installer and run it for you");
+            if (Utils.AskUserInput("Install and run chrome installer? [y/n]")) {
+                string installerFilename;
+                if (Environment.Is64BitOperatingSystem) {
+                    Utils.DownloadFileByUrl("https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BB772F1AF-7BAF-C006-B980-CC577C94EBC7%7D%26lang%3Den%26browser%3D3%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable-statsdef_1%26installdataindex%3Dempty/chrome/install/ChromeStandaloneSetup64.exe", 
+                        ".");
+                    installerFilename = "ChromeStandaloneSetup64.exe";
                 }
                 else {
-                    ColorConsole.Error("Can't continue without chrome installed");
-                    Environment.Exit(0);
+                    Utils.DownloadFileByUrl("https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BB772F1AF-7BAF-C006-B980-CC577C94EBC7%7D%26lang%3Den%26browser%3D3%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dstable-arch_x86-statsdef_1%26installdataindex%3Dempty/chrome/install/ChromeStandaloneSetup.exe", 
+                        ".");
+                    installerFilename = "ChromeStandaloneSetup.exe";
                 }
+                // Running installer and removing it after it was closed
+                var process = Process.Start(new ProcessStartInfo {
+                    CreateNoWindow = false,
+                    FileName = installerFilename
+                });
+                process!.WaitForExit();
+                process.Dispose();
+                File.Delete(installerFilename);
             }
-            
+            else {
+                ColorConsole.Error("Can't continue without chrome installed");
+                Environment.Exit(0);
+            }
             ColorConsole.WriteLine("Seams like chrome was installed successfully", ConsoleColor.Green);
         }
     }
