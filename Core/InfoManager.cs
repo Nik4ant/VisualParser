@@ -35,14 +35,18 @@ namespace VisualParser.Core
                 // If there is new version of chrome, don't have to check old driver
                 if (loadedInfo?.ChromeVersion != chromeVersion) {
                     ColorConsole.Warning("Chrome was updated. Installing new driver...");
-                    // TODO: В этом методе может устанавливаться путь до драйвера и сохраняться настройки...
-                    // поэтому надо либо: а) Указать это где-то б) *вряд ли* отделить этот код оттуда
                     ChromeDriverLoader.Load(chromeVersion);
-                    // TODO: разобраться с save и load'ом
                     // Saving updated info after driver was downloaded
                     Globals.Info.SaveToJson();
                     return;
                 }
+            }
+            else {
+                // Note(Nik4ant): If there is no .json file yet we save ONLY necessary properties
+                Globals.SetAppInfo(new AppInfoContainer {
+                    ChromeVersion = chromeVersion,
+                });
+                Globals.Info.SaveToJson();
             }
             // Check if driver already installed
             string? oldDriverPath = TryGetExistingDriverPath();
@@ -69,7 +73,7 @@ namespace VisualParser.Core
             // More than 1 file in folder
             if (files.Length != 0) {
                 ColorConsole.Warning("WARNING! There are more than 1 files in driver folder");
-                if (Utils.AskUserInput("Do you want to delete them all? [y/n] ")) {
+                if (Utils.AskUserInput("Do you want to delete them all (Recommend)? [y/n] ")) {
                     for (int i = 0; i < files.Length; i++)
                         File.Delete(files[i]);
                 }
@@ -102,7 +106,7 @@ namespace VisualParser.Core
         }
 
         private static void HandleChromeInstallation()  {
-            // TODO: test it later
+            // TODO: test it later on VM
             // In case if user has chrome installed we ask him to select .exe file
             string? newPathToChrome;
             while (Utils.AskUserInput("Do you want to select path to \"chrome.exe\"? [y/n]")) {

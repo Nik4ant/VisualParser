@@ -5,6 +5,8 @@ using System.Text.Json.Serialization;
 namespace VisualParser.Data
 {
     public class AppInfoContainer {
+        // Note(Nik4ant): Init properties is necessary for working
+        // other could be null or loaded/set later
         public string ChromeVersion { get; init; }
         public string PathToDriver { get; private set; }
         public string? CustomPathToChrome { get; private set; }
@@ -29,13 +31,14 @@ namespace VisualParser.Data
             CustomPathToChrome = path;
         }
         
-        // TODO: fix it
         #region json stuff
         public static AppInfoContainer? LoadFromJson() {
-            return JsonSerializer.Deserialize<AppInfoContainer>(Globals.AppInfoPath);
+            using var streamRead = File.OpenRead(Globals.AppInfoPath);
+            return JsonSerializer.Deserialize<AppInfoContainer>(streamRead);
         }
         public void SaveToJson() {
-            JsonSerializer.Serialize(this);
+            using var streamWriter = File.OpenWrite(Globals.AppInfoPath);
+            JsonSerializer.Serialize(streamWriter, this);
         }
         #endregion
     }

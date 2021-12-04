@@ -10,7 +10,8 @@ namespace VisualParser.Core
     public static class ChromeDriverLoader {
          // Link with all chrome drivers data
         private const string ChromeDriversLink = "https://chromedriver.chromium.org/downloads";
-
+        
+        // TODO: mention in docs that it overwrites old driver if there is one
         public static void Load(string browserVersion) {
             string pathToDriverZip = Globals.Info.PathToDriverFolder + $"{Path.DirectorySeparatorChar}driver.zip";
             string downloadUrl = GetDownloadUrl(browserVersion);
@@ -26,7 +27,7 @@ namespace VisualParser.Core
                     string pathToDriverBinary = Path.GetFullPath(Path.Combine(Globals.Info.PathToDriverFolder,
                         driverZipEntry.FullName));
                     // Extracting file
-                    driverZipEntry.ExtractToFile(pathToDriverBinary);
+                    driverZipEntry.ExtractToFile(pathToDriverBinary, true);
                     // Updating path to driver
                     // Note(Nik4ant): Could use "chromedriver.exe" string, but this can be an issue if name changes
                     Globals.Info.SetPathToDriver(pathToDriverBinary);
