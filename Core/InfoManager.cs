@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using VisualParser.Data;
 
@@ -69,7 +70,6 @@ namespace VisualParser.Core
             if (files.Length != 0) {
                 ColorConsole.Warning("WARNING! There are more than 1 files in driver folder");
                 if (Utils.AskUserInput("Do you want to delete them all? [y/n] ")) {
-                    // TODO: for no reason path to files are weird
                     for (int i = 0; i < files.Length; i++)
                         File.Delete(files[i]);
                 }
@@ -102,34 +102,54 @@ namespace VisualParser.Core
         }
 
         private static void HandleChromeInstallation()  {
-            // In case if user has chrome installed we asking him to select .exe file
-            if (Utils.AskUserInput("Do you want to select path to \"chrome.exe\"? [y/n]")) {
-                // TODO: reuse old dialog stuff (put it in Utils)
-                /*
-                Add-Type -AssemblyName System.Windows.Forms;
-                $FileDialog = New-Object System.Windows.Forms.OpenFileDialog -Property @{ InitialDirectory = [Environment]::GetFolderPath('Desktop')\nFilter = '(*.json)|*.json|All files (*.*)|*.*'}
-                $FileDialog.ShowDialog();
-                echo $FileDialog.FileName;
-                 */
+            // TODO: test it later
+            // In case if user has chrome installed we ask him to select .exe file
+            string? newPathToChrome;
+            while (Utils.AskUserInput("Do you want to select path to \"chrome.exe\"? [y/n]")) {
+                newPathToChrome = Utils.SelectSingleFileDialog("Chrome", "*.exe");
+                if (!string.IsNullOrEmpty(newPathToChrome)) {
+                    Globals.Info.SetCustomPathToChrome(newPathToChrome);
+                    ColorConsole.WriteLine($"[Green]Path to chrome was specified[/Green]: {newPathToChrome}");
+                    return;
+                }
+                ColorConsole.Error("Couldn't get selected file! Try again");
+            }
+            // In case if user hasn't chrome
+            ColorConsole.Warning("Program can automatically install chrome browser (NOT RECOMMENDED)");
+            // Auto installation or "semi auto" installation
+            if (Utils.AskUserInput("Use automatic installation? [y/n]")) {
+                // TODO: auto install stuff
             }
             else {
-                ColorConsole.Warning("Program can automatically install chrome browser (NOT TESTED YET)");
-                // Use auto installation or "semi auto" installation
-                if (Utils.AskUserInput("Use automatic installation? [y/n]")) {
-                    // TODO: auto install stuff
-                }
-                else {
-                    // Install and run chrome installer for the user, if he wants so
-                    ColorConsole.Warning("Program will install latest chrome installer and run it for you");
-                    if (Utils.AskUserInput("Install and run chrome installer? [y/n]")) {
-                        // TODO: download + executing
+                // Install and run chrome installer for the user, if he wants so
+                ColorConsole.Warning("Program will install latest chrome installer and run it for you");
+                if (Utils.AskUserInput("Install and run chrome installer? [y/n]")) {
+                    string installerFilename;
+                    if (Environment.Is64BitOperatingSystem) {
+                        Utils.DownloadFileByUrl("https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BB772F1AF-7BAF-C006-B980-CC577C94EBC7%7D%26lang%3Den%26browser%3D3%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable-statsdef_1%26installdataindex%3Dempty/chrome/install/ChromeStandaloneSetup64.exe", 
+                            ".");
+                        installerFilename = "ChromeStandaloneSetup64.exe";
                     }
                     else {
-                        ColorConsole.Error("Can't continue without chrome installed");
-                        Environment.Exit(0);
+                        Utils.DownloadFileByUrl("https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BB772F1AF-7BAF-C006-B980-CC577C94EBC7%7D%26lang%3Den%26browser%3D3%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dstable-arch_x86-statsdef_1%26installdataindex%3Dempty/chrome/install/ChromeStandaloneSetup.exe", 
+                            ".");
+                        installerFilename = "ChromeStandaloneSetup.exe";
                     }
+                    // Running installer and removing it after it was closed
+                    var process = Process.Start(new ProcessStartInfo {
+                        CreateNoWindow = false,
+                        FileName = installerFilename
+                    });
+                    process!.WaitForExit();
+                    process.Dispose();
+                    File.Delete(installerFilename);
+                }
+                else {
+                    ColorConsole.Error("Can't continue without chrome installed");
+                    Environment.Exit(0);
                 }
             }
+            
             ColorConsole.WriteLine("Seams like chrome was installed successfully", ConsoleColor.Green);
         }
     }

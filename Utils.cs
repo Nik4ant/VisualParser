@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using System.IO;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace VisualParser
@@ -24,6 +24,42 @@ namespace VisualParser
             string? result = process?.StandardOutput.ReadToEnd();
             process?.Close();
             return result;
+        }
+        
+        
+        /// <summary>
+        /// Method opens select file dialog and returns path to selected file.
+        /// </summary>
+        /// <param name="selectionTitle">Title for dialog</param>
+        /// <param name="filterString">Filter for file ("*.*" by default)</param>
+        /// <returns>Path to selected file or null</returns>
+        public static string? SelectSingleFileDialog(string selectionTitle="Any file", string filterString = "*.*") {
+            StringBuilder commandBuilder = new();
+            // Name of future process to execute (Windows - powershell, macOS/Linux - terminal)
+            string processName = "powershell";
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                commandBuilder.AppendLine("Add-Type -AssemblyName System.Windows.Forms");
+                commandBuilder.AppendLine("$FileDialog = New-Object System.Windows.Forms.OpenFileDialog -Property @{");
+                commandBuilder.AppendLine("InitialDirectory = [Environment]::GetFolderPath('Desktop')");
+                commandBuilder.AppendLine($"Filter = '{selectionTitle} ({filterString})'");
+                commandBuilder.AppendLine("$FileDialog.ShowDialog()");
+                commandBuilder.AppendLine("echo $FileDialog.Filename");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+                processName = "bash";
+                commandBuilder.AppendLine($"selectedFile = \"$(zenity --file-selection --title='{selectionTitle}') --file-filter={filterString}\"");
+                commandBuilder.AppendLine("echo $selectedFile");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+                // TODO: IDK is zenity is preinstalled on MAC
+                // FIXME: Implement using stuff from here:
+                // https://apple.stackexchange.com/questions/158267/can-i-launch-the-file-save-open-dialog-from-the-command-line
+                // https://developer.apple.com/library/archive/documentation/AppleScript/Conceptual/AppleScriptLangGuide/reference/ASLR_cmds.html#//apple_ref/doc/uid/TP40000983-CH216-SW4
+                processName = "terminal";
+                commandBuilder.AppendLine($"selectedFile = \"$(zenity --file-selection --title='{selectionTitle}') --file-filter={filterString}\"");
+            }
+            return GetProcessData(processName, commandBuilder.ToString());
         }
         
         // TODO: docs
