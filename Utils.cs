@@ -11,22 +11,30 @@ namespace VisualParser
         /// </summary>
         /// <param name="filename">Filename of file to run</param>
         /// <param name="command">Command with all params</param>
-        /// <returns>Data from terminal/command line</returns>
-        public static string? GetProcessData(string filename, string command) {
+        /// <param name="redirectError">If true, returns null on error occurs</param>
+        /// <returns>Data from terminal/command line or null</returns>
+        public static string? GetProcessData(string filename, string command, bool redirectError=false) {
             var process = Process.Start(new ProcessStartInfo {
                 FileName = filename,
                 Arguments = command,
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                RedirectStandardError = redirectError
             });
-            // Reading result and closing process
-            string? result = process?.StandardOutput.ReadToEnd();
-            process?.Close();
+            if (process is null) {
+                ColorConsole.Error($"Can't run process {filename} with args: {command}");
+                return null;
+            }
+            // Check for errors
+            if (redirectError && process.StandardError.ReadToEnd() != "")
+                return null;
+            
+            string result = process.StandardOutput.ReadToEnd();
+            process.Close();
             return result;
         }
-        
-        
+
         /// <summary>
         /// Method opens select file dialog and returns path to selected file.
         /// </summary>
@@ -48,25 +56,24 @@ namespace VisualParser
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 processName = "bash";
-                commandBuilder.AppendLine($"selectedFile = \"$(zenity --file-selection --title='{selectionTitle}') --file-filter={filterString}\"");
-                commandBuilder.AppendLine("echo $selectedFile");
+                commandBuilder.AppendLine($"echo \"$(zenity --file-selection --title='{selectionTitle}' --file-filter='{filterString}')\"");
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-                // TODO: IDK is zenity is preinstalled on MAC
-                // FIXME: Implement using stuff from here:
-                // https://apple.stackexchange.com/questions/158267/can-i-launch-the-file-save-open-dialog-from-the-command-line
-                // https://developer.apple.com/library/archive/documentation/AppleScript/Conceptual/AppleScriptLangGuide/reference/ASLR_cmds.html#//apple_ref/doc/uid/TP40000983-CH216-SW4
                 processName = "terminal";
-                commandBuilder.AppendLine($"selectedFile = \"$(zenity --file-selection --title='{selectionTitle}') --file-filter={filterString}\"");
+                commandBuilder.AppendLine($"echo \"$(zenity --file-selection --title='{selectionTitle}' --file-filter='{filterString}')\"");
             }
             return GetProcessData(processName, commandBuilder.ToString());
         }
         
-        // TODO: docs
-        public static void ExecuteProcess(string filename, string command) {
+        /// <summary>
+        /// Method executes process with given args
+        /// </summary>
+        /// <param name="filename">Process to execute</param>
+        /// <param name="arguments">Arguments to pass</param>
+        public static void ExecuteProcess(string filename, string arguments) {
             var process = Process.Start(new ProcessStartInfo {
                 FileName = filename,
-                Arguments = command,
+                Arguments = arguments,
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardError = true
@@ -78,7 +85,11 @@ namespace VisualParser
             }
         }
         
-        // TODO: docs
+        /// <summary>
+        /// Method downloads file by given url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="pathToSave">Path to the download folder</param>
         public static void DownloadFileByUrl(string url, string pathToSave) {
             WebClient webClient = new();
             webClient.DownloadFile(url, pathToSave);

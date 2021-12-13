@@ -106,11 +106,10 @@ namespace VisualParser.Core
         }
 
         private static void HandleChromeInstallation()  {
-            // TODO: test it later on VM
+            // TODO: test it fully on VM
             // In case if user has chrome installed we ask him to select .exe file
-            string? newPathToChrome;
             while (Utils.AskUserInput("Do you want to select path to \"chrome.exe\"? [y/n]")) {
-                newPathToChrome = Utils.SelectSingleFileDialog("Chrome", "*.exe");
+                string? newPathToChrome = Utils.SelectSingleFileDialog("Chrome", "*.exe");
                 if (!string.IsNullOrEmpty(newPathToChrome)) {
                     Globals.Info.SetCustomPathToChrome(newPathToChrome);
                     ColorConsole.WriteLine($"[Green]Path to chrome was specified[/Green]: {newPathToChrome}");
