@@ -1,5 +1,6 @@
-## todo list:
+# todo list:
 1 Create a table with things that was tested and wasn't. (Mostly for OS depended stuff, like file dialogs, chrome version selection and etc.)
+
 # Make selenium undetectable:
 0. __WARNING!!! Some of this tips might be mentioned in [[#Special vars strings etc]]__
 1. Remove (or set to false, idk) Navigator.Webdriver Flag
@@ -22,8 +23,7 @@
 13. In the final script use smooth mouse movements (for example, with curves or find another solution)
 14. Add extensions to the browser from original profile (maybe they will be added automatically after copying existing profile, idk)
 15. Work with vars, strings that uncover selenium usage. Because this topic is big, it is described below [[#Special vars strings etc]]
-16. Modifying selenium responses sounds like a good idea, check out [[#How to use most of this vars]]
-
+16. Modifying selenium responses sounds like a good idea, check out [[#How to use most of vars]]
 
 ## Special vars, strings, etc.
 ### Strings with known meaning (except common `$cdc_`): 
@@ -62,10 +62,11 @@
 `callSelenium`
 `__webdriver_evaluate`
 ### How to use most of vars:
-1. There is a possibility that they could be mentioned in a response from webdriver. However, replacing all of strings might be bad for performance, so this needs testing and maybe changing 
-
-
-## The best way to hide/change/remove vars:
+There is a possibility that they could be mentioned in a response from webdriver. So program needs to track `requests` and `responses`, this links should help:
+https://octopus.com/blog/selenium/15-modifying-http-responses/modifying-http-responses
+https://automated-testing.info/t/rabota-s-trafikom-fetch-xhr-pri-pomoshhi-selenium-4-webdriver-primer-vnutri/25503/17
+(P.s. However, replacing all of strings is probably a bad idea, so this needs testing and tweaking)
+### The best way to hide/change/remove vars:
 1. Overriding only base property isn't enough, because there is a `.prototype` property with all vars
 2. Overriding getter function is bad idea, because in `js` you can get function code as a string, so this the moment when `3` and `4` come into play
 3. We can intercept the call to getter and change the returned value using js `Proxy apply`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/apply
