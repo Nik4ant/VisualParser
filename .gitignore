@@ -1,4 +1,4 @@
-﻿/Driver
-/.idea
+﻿/src/Driver
+*/.idea/*
 /bin
 /obj

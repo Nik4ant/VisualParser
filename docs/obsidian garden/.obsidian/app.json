@@ -1,0 +1,13 @@
+{
+  "promptDelete": false,
+  "spellcheck": true,
+  "spellcheckDictionary": [
+    "params",
+    "todo",
+    "dialogs",
+    "idk",
+    "urls",
+    "getter",
+    "webdriver"
+  ]
+}

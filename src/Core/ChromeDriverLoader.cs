@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Net;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.IO.Compression;
@@ -11,7 +10,11 @@ namespace VisualParser.Core
          // Link with all chrome drivers data
         private const string ChromeDriversLink = "https://chromedriver.chromium.org/downloads";
         
-        // TODO: mention in docs that it overwrites old driver if there is one
+        /// <summary>
+        /// Method loads compatible driver for given browser version.
+        /// (If there is driver already it will be overwritten)
+        /// </summary>
+        /// <param name="browserVersion">Current chrome version</param>
         public static void Load(string browserVersion) {
             string pathToDriverZip = Globals.Info.PathToDriverFolder + $"{Path.DirectorySeparatorChar}driver.zip";
             string downloadUrl = GetDownloadUrl(browserVersion);
@@ -47,10 +50,10 @@ namespace VisualParser.Core
                 Utils.ExecuteProcess("chmod", $"+x {pathToDriverZip}");
             // TODO: cdc_ string
             RemoveCdcString();
+            ColorConsole.WriteLine("Removed cdc_ string successfully (NOPE)", ConsoleColor.Green);
         }
 
         private static void RemoveCdcString() {
-            ColorConsole.WriteLine("Removed cdc_ string successfully (NOPE)");
             // TODO:
         }
         
