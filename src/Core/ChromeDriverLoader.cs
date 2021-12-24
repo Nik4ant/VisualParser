@@ -27,10 +27,13 @@ namespace VisualParser.Core
                 using (var zipArchive = new ZipArchive(readStream, ZipArchiveMode.Read)) {
                     // .zip file has only one entry with chromedriver.exe
                     var driverZipEntry = zipArchive.Entries[0];
-                    string pathToDriverBinary = Path.GetFullPath(Path.Combine(Globals.Info.PathToDriverFolder,
-                        driverZipEntry.FullName));
+                    string pathToDriverBinary = Path.GetFullPath(driverZipEntry.FullName, Globals.Info.PathToDriverFolder);
                     // Extracting file
                     driverZipEntry.ExtractToFile(pathToDriverBinary, true);
+                    ColorConsole.Error(pathToDriverBinary.Contains('\n').ToString());
+                    // Adding executable permission (u+x) to allow the execution of the chromedriver
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                        Utils.ExecuteProcess("chmod", $"u+x \"{pathToDriverBinary}\"");
                     // Updating path to driver
                     // Note(Nik4ant): Could use "chromedriver.exe" string, but this can be an issue if name changes
                     Globals.Info.SetPathToDriver(pathToDriverBinary);
@@ -45,9 +48,6 @@ namespace VisualParser.Core
                 ColorConsole.WriteLine($"Path: [Red]{pathToDriverZip}[/Red]");
                 ColorConsole.WriteLine($"Error text: [Red]{e.Message}[/Red]");
             }
-            // On Linux/macOS, you need to add the executable permission (+x) to allow the execution of the chromedriver
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                Utils.ExecuteProcess("chmod", $"+x {pathToDriverZip}");
             // TODO: cdc_ string
             RemoveCdcString();
             ColorConsole.WriteLine("Removed cdc_ string successfully (NOPE)", ConsoleColor.Green);

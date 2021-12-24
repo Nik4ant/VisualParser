@@ -14,14 +14,14 @@ namespace VisualParser.Data
         // Paths to Static and Driver folders with default values
         #if DEBUG
             [JsonIgnore]
-            public string PathToDriverFolder { get; private set; } = $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}Driver";
+            public string PathToDriverFolder { get; private set; } = Path.GetFullPath($"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}Driver");
             [JsonIgnore]
-            public string PathToStaticFolder { get; private set; } = $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}Static";
+            public string PathToStaticFolder { get; private set; } = Path.GetFullPath($"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}Static");
         #else
             [JsonIgnore]
-            public string PathToDriverFolder { get; private set; } = $"{Path.DirectorySeparatorChar}Driver";
-            [JsonIgnore]            
-            public string PathToStaticFolder { get; private set; } = $"..{Path.DirectorySeparatorChar}Static";
+            public string PathToDriverFolder { get; private set; } = Path.GetFullPath("Driver");
+            [JsonIgnore]      
+            public string PathToStaticFolder { get; private set; } = Path.GetFullPath("Static");
         #endif
 
         public void SetPathToDriver(string path) {

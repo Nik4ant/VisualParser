@@ -1,5 +1,4 @@
 ﻿global using System;
-
 using VisualParser.Data;
 
 namespace VisualParser

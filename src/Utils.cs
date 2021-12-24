@@ -48,19 +48,20 @@ namespace VisualParser
             
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 commandBuilder.AppendLine("Add-Type -AssemblyName System.Windows.Forms");
-                commandBuilder.AppendLine("$FileDialog = New-Object System.Windows.Forms.OpenFileDialog -Property @{");
-                commandBuilder.AppendLine("InitialDirectory = [Environment]::GetFolderPath('Desktop')");
-                commandBuilder.AppendLine($"Filter = '{selectionTitle} ({filterString})'");
+                commandBuilder.AppendLine("$FileDialog = New-Object System.Windows.Forms.OpenFileDialog");
+                commandBuilder.AppendLine("$FileDialog.InitialDirectory = [Environment]::GetFolderPath('Desktop')");
+                commandBuilder.AppendLine($"$FileDialog.Filter = '{selectionTitle} ({filterString}) | {filterString}'");
                 commandBuilder.AppendLine("$FileDialog.ShowDialog()");
                 commandBuilder.AppendLine("echo $FileDialog.Filename");
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
-                processName = "bash";
-                commandBuilder.AppendLine($"echo \"$(zenity --file-selection --title='{selectionTitle}' --file-filter='{filterString}')\"");
+                processName = "/bin/bash";
+                commandBuilder.Append($"-c \"echo `zenity --file-selection --title='{selectionTitle}' --file-filter='{filterString}'`\"");
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
                 processName = "terminal";
-                commandBuilder.AppendLine($"echo \"$(zenity --file-selection --title='{selectionTitle}' --file-filter='{filterString}')\"");
+                // TODO: test
+                commandBuilder.Append($"-c \" echo $(zenity --file-selection --title='{selectionTitle}' --file-filter='{filterString}')\"");
             }
             return GetProcessData(processName, commandBuilder.ToString());
         }
@@ -88,23 +89,18 @@ namespace VisualParser
         /// <summary>
         /// Method downloads file by given url
         /// </summary>
-        /// <param name="url"></param>
-        /// <param name="pathToSave">Path to the download folder</param>
-        public static void DownloadFileByUrl(string url, string pathToSave) {
+        public static void DownloadFileByUrl(string url, string filename) {
             WebClient webClient = new();
-            webClient.DownloadFile(url, pathToSave);
+            webClient.DownloadFile(url, filename);
             webClient.Dispose();
         }
         
+        
         /// <summary>
-        /// Method for easier use of [y/n] questions for user
+        /// Method for reading [y/n] questions input
         /// </summary>
-        /// <param name="textQuestion">Question</param>
-        /// <param name="questionColor">Color for printing question</param>
-        /// <returns>true if 'y' false if 'n'</returns>
-        public static bool AskUserInput(string textQuestion, ConsoleColor questionColor = ConsoleColor.DarkGray) {
-            // TODO: add [y/n] string here + mention it in docs
-            ColorConsole.Write(textQuestion, questionColor);
+        /// <returns>true if 'y', false if 'n'</returns>
+        private static bool AskUserInput() {
             bool result;
             while (true) {
                 var key = Console.ReadKey(true).Key;
@@ -119,6 +115,35 @@ namespace VisualParser
             }
             Console.Write('\n');
             return result;
+        }
+        
+        /// <summary>
+        /// Method for [y/n] questions for user.
+        /// (Automatically add " [y/n] " string to question)
+        /// </summary>
+        /// <param name="textQuestion">Question</param>
+        /// <param name="questionColor">Color for printing question</param>
+        /// <returns>true if 'y' false if 'n'</returns>
+        public static bool AskUserInput(string textQuestion, ConsoleColor questionColor = ConsoleColor.DarkGray) {
+            ColorConsole.Write(textQuestion, questionColor);
+            ColorConsole.Write(" [y/n] ", questionColor);
+            return AskUserInput();
+        }
+        
+        /// <summary>
+        /// Method for [y/n] questions, but with more colors.
+        /// (Automatically add " [y/n] " string to question)
+        /// </summary>
+        /// <param name="textQuestion">Question</param>
+        /// <param name="useCustomColorQuestion">Parsing colors from string if true else default color</param>
+        /// <returns>true if 'y', false if 'n'</returns>
+        public static bool AskUserInput(string textQuestion, bool useCustomColorQuestion) {
+            if (useCustomColorQuestion)
+                ColorConsole.Write(textQuestion);
+            else
+                return AskUserInput(textQuestion, ConsoleColor.Gray);
+            Console.Write(" [y/n] ");
+            return AskUserInput();
         }
     }
 

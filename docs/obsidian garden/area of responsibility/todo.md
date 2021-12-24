@@ -1,7 +1,8 @@
-# todo list:
-1 Create a table with things that was tested and wasn't. (Mostly for OS depended stuff, like file dialogs, chrome version selection and etc.)
+# todo:
+1. Think about using  `Newtonsoft` for instead of `System.Text.Json` (`Newtonsoft` because it's built in with `Selenium` + with IL trimming there is a chance to get rid of `System.Text.Json` idk)
+2. There is a way to use `tailwind` with static pages. Just use `link` in `head` and that's it: https://www.freecodecamp.org/news/what-is-tailwind-css-and-how-can-i-add-it-to-my-website-or-react-app/#part-1-adding-tailwind-css-to-a-static-html-page
 
-# Make selenium undetectable:
+### Make selenium undetectable:
 0. __WARNING!!! Some of this tips might be mentioned in [[#Special vars strings etc]]__
 1. Remove (or set to false, idk) Navigator.Webdriver Flag
 2. Obfuscating JavaScript of Browser Driver EXE. Replace `$cdc_asdjflasutopfhvcZLmcfl_` with string **of the same length**

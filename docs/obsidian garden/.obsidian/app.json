@@ -8,6 +8,11 @@
     "idk",
     "urls",
     "getter",
-    "webdriver"
-  ]
+    "webdriver",
+    "MacOS",
+    "json",
+    "chromedriver"
+  ],
+  "legacyEditor": true,
+  "livePreview": true
 }

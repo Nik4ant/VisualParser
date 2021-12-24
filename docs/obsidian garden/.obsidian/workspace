@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "area of responsibility/todo.md",
+            "file": "area of responsibility/tests.md",
             "mode": "source"
           }
         }
@@ -68,7 +68,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "area of responsibility/todo.md",
+                "file": "area of responsibility/tests.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -85,7 +85,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "area of responsibility/todo.md",
+                "file": "area of responsibility/tests.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -104,17 +104,17 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "active": "042424425400ceed",
   "lastOpenFiles": [
+    "area of responsibility/tests.md",
     "area of responsibility/todo.md",
-    "area of responsibility/done.md",
+    "project/ideas.md",
     "README.md",
     "remember....md",
+    "area of responsibility/done.md",
     "area of responsibility/tested.md",
-    "project/ideas.md",
     "area of responsibility/dedline goals.md"
   ]
 }
