@@ -11,7 +11,8 @@
     "webdriver",
     "MacOS",
     "json",
-    "chromedriver"
+    "chromedriver",
+    "Undetection"
   ],
   "legacyEditor": true,
   "livePreview": true

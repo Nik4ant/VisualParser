@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace VisualParser
@@ -60,7 +59,6 @@ namespace VisualParser
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
                 processName = "terminal";
-                // TODO: test
                 commandBuilder.Append($"-c \" echo $(zenity --file-selection --title='{selectionTitle}' --file-filter='{filterString}')\"");
             }
             return GetProcessData(processName, commandBuilder.ToString());
@@ -94,8 +92,7 @@ namespace VisualParser
             webClient.DownloadFile(url, filename);
             webClient.Dispose();
         }
-        
-        
+
         /// <summary>
         /// Method for reading [y/n] questions input
         /// </summary>

@@ -238,3 +238,8 @@ div.markdown-preview-view {
   font-size: 14px;
   font-weight: 600;
 }
+
+/* Custom style for making top-right buttons lighter on dark background */
+.titlebar-button {
+  color: #fff !important; 
+}

@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Text;
-using System.Runtime.InteropServices;
+﻿using System.Text;
 using System.IO.Compression;
 using HtmlAgilityPack;
 
@@ -11,15 +9,18 @@ namespace VisualParser.Core
         private const string ChromeDriversLink = "https://chromedriver.chromium.org/downloads";
         
         /// <summary>
-        /// Method loads compatible driver for given browser version.
+        /// Method loads compatible driver for given browser version and
+        /// returns path to installed driver.
         /// (If there is driver already it will be overwritten)
         /// </summary>
         /// <param name="browserVersion">Current chrome version</param>
-        public static void Load(string browserVersion) {
-            string pathToDriverZip = Globals.Info.PathToDriverFolder + $"{Path.DirectorySeparatorChar}driver.zip";
+        /// <returns>Path to loaded driver</returns>
+        public static string Load(string browserVersion) {
+            string pathToDriverBinary;
+            string pathToDriverZip = AbsolutePathToDriverFolder + $"{Path.DirectorySeparatorChar}driver.zip";
             string downloadUrl = GetDownloadUrl(browserVersion);
             // Creating "Driver" folder if it doesn't exists
-            Directory.CreateDirectory(Globals.Info.PathToDriverFolder);
+            Directory.CreateDirectory(AbsolutePathToDriverFolder);
             // Downloading chrome driver
             Utils.DownloadFileByUrl(downloadUrl, Path.GetFullPath(pathToDriverZip));
             try {
@@ -27,19 +28,13 @@ namespace VisualParser.Core
                 using (var zipArchive = new ZipArchive(readStream, ZipArchiveMode.Read)) {
                     // .zip file has only one entry with chromedriver.exe
                     var driverZipEntry = zipArchive.Entries[0];
-                    string pathToDriverBinary = Path.GetFullPath(driverZipEntry.FullName, Globals.Info.PathToDriverFolder);
+                    pathToDriverBinary = Path.GetFullPath(driverZipEntry.FullName, AbsolutePathToDriverFolder);
                     // Extracting file
                     driverZipEntry.ExtractToFile(pathToDriverBinary, true);
-                    ColorConsole.Error(pathToDriverBinary.Contains('\n').ToString());
                     // Adding executable permission (u+x) to allow the execution of the chromedriver
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                         Utils.ExecuteProcess("chmod", $"u+x \"{pathToDriverBinary}\"");
-                    // Updating path to driver
-                    // Note(Nik4ant): Could use "chromedriver.exe" string, but this can be an issue if name changes
-                    Globals.Info.SetPathToDriver(pathToDriverBinary);
                 }
-                // Saving updated info after driver was downloaded
-                Globals.Info.SaveToJson();
                 // Deleting .zip file
                 File.Delete(pathToDriverZip);
             }
@@ -47,10 +42,14 @@ namespace VisualParser.Core
                 ColorConsole.WriteLine("[Red]ERROR![/Red] Something went wrong during zip extracting");
                 ColorConsole.WriteLine($"Path: [Red]{pathToDriverZip}[/Red]");
                 ColorConsole.WriteLine($"Error text: [Red]{e.Message}[/Red]");
+                // Note(Nik4ant): Couldn't exit using Environment.Exit() method, because of compilation error.
+                // (It's not guaranteed that method returns a value because Environment.Exit)
+                throw;
             }
             // TODO: cdc_ string
             RemoveCdcString();
             ColorConsole.WriteLine("Removed cdc_ string successfully (NOPE)", ConsoleColor.Green);
+            return pathToDriverBinary;
         }
 
         private static void RemoveCdcString() {
@@ -79,9 +78,7 @@ namespace VisualParser.Core
         }
         
         private static string GetCompatibleVersion(string majorBrowserVersion) {
-            // Load html to document
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(new HtmlWeb().Load(ChromeDriversLink).Text);
+            var htmlDoc = new HtmlWeb().Load(ChromeDriversLink);
             // Selecting needed nodes
             var nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='XqQF9c'][@target='_blank']");
             // Selecting only driver version and return it if it match given major version

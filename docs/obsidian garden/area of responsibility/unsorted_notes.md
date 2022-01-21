@@ -1,6 +1,10 @@
+## Now it's more like a archive notes, but they are still useful, so i decided to keep them here for now
+
+
 # todo:
-1. Think about using  `Newtonsoft` for instead of `System.Text.Json` (`Newtonsoft` because it's built in with `Selenium` + with IL trimming there is a chance to get rid of `System.Text.Json` idk)
-2. There is a way to use `tailwind` with static pages. Just use `link` in `head` and that's it: https://www.freecodecamp.org/news/what-is-tailwind-css-and-how-can-i-add-it-to-my-website-or-react-app/#part-1-adding-tailwind-css-to-a-static-html-page
+1. There is a way to use `tailwind` with static pages. Just use `link` in `head` and that's it: https://www.freecodecamp.org/news/what-is-tailwind-css-and-how-can-i-add-it-to-my-website-or-react-app/#part-1-adding-tailwind-css-to-a-static-html-page
+2. Think about info for [resources]
+IT'S POSSIBLE TO PASS C# CALLBACK INTO JS CODE with executing js code asynchronously
 
 ### Make selenium undetectable:
 0. __WARNING!!! Some of this tips might be mentioned in [[#Special vars strings etc]]__

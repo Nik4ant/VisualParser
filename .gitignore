@@ -1,5 +1,9 @@
-﻿/src/Driver
-*/.idea/*
+﻿*/.idea/*
+
+VisualParser.sln
 /bin
 /obj
+
+/src/Driver
 /docs/obsidian garden/.obsidian/workspace
+/docs/obsidian garden/area of responsibility/todo current.md
