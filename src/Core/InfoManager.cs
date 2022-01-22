@@ -79,7 +79,12 @@ namespace VisualParser.Core
             appInfo.SaveToJson();
         }
         
-        // TODO: docs
+        /// <summary>
+        /// Adds info that can be accessed only inside browser using js code.
+        /// Data transferred from browser to C# via http request
+        /// (WARNING: Method creates new chrome window and close it after a few ms)
+        /// </summary>
+        /// <param name="target">Browser info to extend</param>
         private static void AddDetailedBrowserInfo(ChromeBrowserInfo target) {
             // Http listener to parse request from js page
             var httpListener = new HttpListener();
@@ -97,16 +102,20 @@ namespace VisualParser.Core
                 Environment.Exit(1);
             }
             // Reading json data from request
-            var request = httpListener.GetContext().Request;
+            var httpContext = httpListener.GetContext();
+            var request = httpContext.Request;
             using var requestInputStream = new StreamReader(request.InputStream, request.ContentEncoding);
             using var jsonReader = new JsonTextReader(requestInputStream);
             var parsedInfo = new JsonSerializer().Deserialize<Dictionary<string, string>>(jsonReader);
+            // We send back an empty request to signal that data was processed
+            httpContext.Response.ContentLength64 = 0;
+            httpContext.Response.OutputStream.Close();
             // Closing chrome and localhost
             process.Close();
             httpListener.Stop();
             // Check if info was deserialized successfully
             if (parsedInfo is null) {
-                requestInputStream.BaseStream.Seek(0, SeekOrigin.Begin);  // Used for read call below
+                requestInputStream.BaseStream.Seek(0, SeekOrigin.Begin);
                 ColorConsole.Error("Couldn't deserialize info from JS request");
                 ColorConsole.Error($"JS request input stream:\n{requestInputStream.ReadToEnd()}");
                 Environment.Exit(1);

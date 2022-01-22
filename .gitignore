@@ -1,6 +1,6 @@
-﻿*/.idea/*
+﻿*/.idea/**
 
-VisualParser.sln
+/VisualParser.sln
 /bin
 /obj
 

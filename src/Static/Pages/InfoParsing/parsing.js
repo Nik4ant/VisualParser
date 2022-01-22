@@ -32,11 +32,10 @@ fetch(
         }),
         headers: new Headers({ 'Content-Type': 'application/json' })
     })
-)
-    .catch(error => {
-        console.log(error)
-        // bug: C# code freezes (seams like infinite wait http request)
-        window.close();
-    });
+).then(_ => {
+    // Close window only after request was processed to avoid
+    // closing window (browser) to early
+    console.log("Request was processed by C#");
+    window.close();
+});
 console.log("Request was sent")  // just for debug
-window.close();
